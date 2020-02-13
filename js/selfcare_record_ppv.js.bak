@@ -1,0 +1,547 @@
+
+var left_focus_index=0;
+var left_focus_length=length;
+var left_focus_flag=1;
+custom_load_page();
+function custom_load_page(){
+//alert("focus_now====");
+load_allData();
+
+init_focus();
+page_up_down();
+}
+/*function $(id) {
+    if (!$$[id]) {
+        $$[id]=document.getElementById(id);
+    }
+    return $$[id];
+}*/
+
+
+document.onkeypress = cateKeyPressa;
+
+function commonKeyPress(evt) {
+    var keycode = evt.which;
+    if (keycode == 0x0101) { //????????
+        _window.top.remoteChannelPlus();
+    } else if (keycode == 0x0102) {
+        _window.top.remoteChannelMinus();
+    } else if (keycode == 0x0110) {
+        //Authentication.CTCSetConfig("KeyValue", "0x110");
+        _window.top.mainWin.document.location = "portal.jsp";
+    } else if (keycode == 36) {
+        _window.top.mainWin.document.location = "portal.jsp";
+    } else if (keycode == 0x0008 || keycode == 24) {
+		//alert("111111111back");
+       _window.top.mainWin.document.location = "back.jsp";
+	    
+    } else {
+        _window.top.doKeyPress(evt);
+    }
+}
+
+function cateKeyPressa(evt) {
+    var keyCode = parseInt(evt.which);
+   // alert("keycode======"+keyCode);
+    if (keyCode == 0x0028) { //onKeyDown
+	 
+        cateKeyDown();
+    } else if (keyCode == 0x0026) {//onKeyUp
+	
+        cateKeyUp();
+    } else if (keyCode == 0x0025) { //onKeyLeft
+	
+        cateKeyLeft();
+    } else if (keyCode == 0x0027) { //onKeyRight
+	
+        cateKeyRight();
+    } else if (keyCode == 0x000D) {  //OK
+	
+        cateKeyOK();
+    } else if (keyCode == 0x0008 || keyCode == 24 || keyCode==8 ) {
+		//alert("111111111back");
+       _window.top.mainWin.document.location = "back.jsp";
+	    
+    }else {
+		//clearBackParam();
+        _window.top.mainWin.commonKeyPress(evt);
+	
+        return true;
+    }
+    return false;
+}
+// function doKeyPress(evt) {
+//     var keycode = evt.which;
+//// alert("keycode:"+keycode);
+// //	//g_o.debug.print_log("*******keycode:"+keycode);
+//     if (keycode == 119) {//左
+//         cateKeyLeft();
+//     } else if (keycode == 115) {//右
+//         cateKeyRight();
+//    } else if (keycode == 0) {//确认
+//         cateKeyOK();
+//     } else if (keycode == 113) {//上
+//         cateKeyUp();
+//     } else if (keycode == 97) {//下
+//          cateKeyDown();
+//     } else {
+//       //  commonKeyPress(evt);
+//     }
+//     return false;
+// }
+//function doKeyPress(evt) {
+//    var keycode = evt.which;
+//	//g_o.debug.print_log("keycode:"+keycode);
+//    if (keycode == 37) {
+//        cateKeyLeft();
+//    } else if (keycode == 39) {
+//        cateKeyRight();
+//    } else if (keycode == 13) {
+//        cateKeyOK();
+//    } else if (keycode == 38) {
+//        cateKeyUp();
+//    } else if (keycode == 40) {
+//         cateKeyDown();
+//    } else {
+//        commonKeyPress(evt);
+//    }
+//    return false;
+//}
+
+function doKeyPress(evt) {
+    var keycode = evt.which;
+	//g_o.debug.print_log("keycode:"+keycode);
+    if (keycode == 0x0025) {
+        cateKeyLeft();
+    } else if (keycode == 0x0027) {
+        cateKeyRight();
+    } else if (keycode == 0x000D) {
+        cateKeyOK();
+    } else if (keycode == 0x0026) {
+        cateKeyUp();
+    } else if (keycode == 0x0028) {
+         cateKeyDown();
+    } else {
+        commonKeyPress(evt);
+    }
+    return false;
+}
+
+function show_product_list(){
+  
+    for(var i=0; i<5; i++){
+	var m = istart+i;
+    if(m<iend){
+	document.getElementById("package_name_"+i).innerHTML = writeFitString(month_orderLsit[m].productName, 18, 120);
+	}else{
+	document.getElementById("package_name_"+i).innerHTML = "";
+	}
+   }
+   //document.getElementById("product_program_name").innerHTML = length;
+}
+
+function show_product_recommend(focusindex){
+  //document.getElementById("info").innerHTML = "已于"+product['begintimea'][focusindex]+"订购成功，有效期30天，有效期至"+product['endtimea'][focusindex]+"，扣费"+product['feecosta'][focusindex]+"元。";
+  document.getElementById("userID").innerHTML="用户账号："+userID;//显示用户账号
+  if(length>0){
+	  
+	 document.getElementById("product_name").innerHTML ="产品名称："+month_orderLsit[focusindex].productName;
+  	 //document.getElementById("product_price").innerHTML ="产品价格："+product['feecosta'][focusindex]+"元/月";
+	 var curprice=month_orderLsit[focusindex].fee/100;
+	  document.getElementById("product_price1").innerHTML = curprice+"元/月";
+    	if(month_orderLsit[focusindex].productID == "100320"){
+	        document.getElementById("product_price1").style.textDecoration = "line-through"; 
+			document.getElementById("current_price").style.visibility ="visible";
+	        document.getElementById("current_price").innerHTML ="<font color=\"#f2f104\">39.9元/月</font>";
+    	 }else if(month_orderLsit[focusindex].productID== "100325"){
+	        document.getElementById("product_price1").style.textDecoration = "line-through"; 
+			document.getElementById("current_price").style.visibility ="visible";
+	        document.getElementById("current_price").innerHTML ="<font color=\"#f2f104\">29.9元/月</font>";
+    	 }else if(month_orderLsit[focusindex].productID == "100326"){
+	        document.getElementById("product_price1").style.textDecoration = "line-through"; 
+			document.getElementById("current_price").style.visibility ="visible";
+	        document.getElementById("current_price").innerHTML ="<font color=\"#f2f104\">19.9元/月</font>";
+    	 }else if(month_orderLsit[focusindex].productID == "100327"){
+	        document.getElementById("product_price1").style.textDecoration = "line-through"; 
+			document.getElementById("current_price").style.visibility ="visible";
+	        document.getElementById("current_price").innerHTML ="<font color=\"#f2f104\">29.9元/月</font>";
+	 }else if(month_orderLsit[focusindex].productID == "100328"){
+	        document.getElementById("product_price1").style.textDecoration = "line-through"; 
+			document.getElementById("current_price").style.visibility ="visible";
+	        document.getElementById("current_price").innerHTML ="<font color=\"#f2f104\">29.99元/月</font>";
+    	 }else{
+			document.getElementById("product_price1").style.textDecoration = "none"; 
+			document.getElementById("current_price").style.visibility ="hidden";
+	  }
+	  
+	 //备注 
+  if(month_orderLsit[focusindex].productID == "100320"){
+		 document.getElementById("product_remark").innerHTML ="产品备注：优惠日期2017年1月1日0:00-2018年12月31日24:00"; 
+	  }else if(month_orderLsit[focusindex].productID == "100325"){
+		 document.getElementById("product_remark").innerHTML ="产品备注：优惠日期2017年1月1日0:00-2018年12月31日24:00"; 
+	  }else if(month_orderLsit[focusindex].productID== "100326"){
+		 document.getElementById("product_remark").innerHTML ="产品备注：优惠日期2017年1月1日0:00-2018年12月31日24:00"; 
+	  }else if(month_orderLsit[focusindex].productID== "100327"){
+     document.getElementById("product_remark").innerHTML ="产品备注：优惠日期2017年3月1日0:00-2018年12月31日24:00"; 
+	  }else if(month_orderLsit[focusindex].productID == "100328"){
+		document.getElementById("product_remark").innerHTML ="产品备注：优惠日期2017年7月1日0:00-2018年4月30日24:00"; 
+	  }else{
+		 document.getElementById("product_remark").innerHTML =""; 
+	 } 
+	 //信息
+     if(month_orderLsit[focusindex].productID == "100321"){
+		 
+		
+		 document.getElementById("product_info").innerHTML ="产品备注：<font color=\"#ffde00\">无广告纯享包月产品“淘电影”、“淘剧场”、“淘影视”已于2017年5月1日升级，价格上调，此前订购的用户不退订将继续享受原有优惠价格不变！退订后再订购将按新价格计费。</font>"; 
+	  }else if(month_orderLsit[focusindex].productID == "100322"){
+		  
+		 document.getElementById("product_info").innerHTML ="产品备注：<font color=\"#ffde00\">无广告纯享包月产品“淘电影”、“淘剧场”、“淘影视”已于2017年5月1日升级，价格上调，此前订购的用户不退订将继续享受原有优惠价格不变！退订后再订购将按新价格计费。</font>"; 
+	  }else if(month_orderLsit[focusindex].productID == "100323"){
+		  
+		 document.getElementById("product_info").innerHTML ="产品备注：<font color=\"#ffde00\">无广告纯享包月产品“淘电影”、“淘剧场”、“淘影视”已于2017年5月1日升级，价格上调，此前订购的用户不退订将继续享受原有优惠价格不变！退订后再订购将按新价格计费。</font>"; 
+	  }else{
+		 
+		 document.getElementById("product_info").innerHTML =""; 
+	 } 
+	var dateString=month_orderLsit[focusindex].effectTime;
+	var  pattern = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
+var formatedDate = dateString.replace(pattern, '$1-$2-$3 $4:$5:$6');
+	
+     document.getElementById("product_ordertime").innerHTML ="订购时间："+formatedDate; 
+  }else{
+	 document.getElementById("product_a").style.display="none";
+  }
+  
+}
+
+function cateKeyDown(){
+	if(document.getElementById("dialog_subscribe").style.visibility == "hidden" && document.getElementById("unsubscribe_focus").style.visibility == "hidden" && length > 0){
+    blur_left_index(left_focus_index);
+	textScroll(-1);
+	left_focus_index++;
+	if(istart+left_focus_index<iend){
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}else{
+		page_next();
+		show_product_list();
+		left_focus_index=0;
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}
+	}
+}
+
+function cateKeyUp(){
+	if(document.getElementById("dialog_subscribe").style.visibility == "hidden" && document.getElementById("unsubscribe_focus").style.visibility == "hidden" && length > 0){
+    blur_left_index(left_focus_index);
+	textScroll(-1);
+	left_focus_index--;
+	if(left_focus_index>=0){
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}else{
+		page_prev();
+		show_product_list();
+		left_focus_index=0;
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}
+	}
+}
+
+function cateKeyLeft(){
+   if(document.getElementById("unsubscribe_focus").style.visibility=="visible"){
+	   document.getElementById("unsubscribe_focus").style.visibility="hidden";
+	   left_focus_flag=1;
+		focus_left_index(left_focus_index);
+		textScroll(1);
+	}else
+   if(document.getElementById("dialog_subscribe").style.visibility=="visible"){
+		if(document.getElementById("dialog_subscribe_button").style.visibility=="visible"){
+			document.getElementById("dialog_subscribe_button").style.visibility="hidden";
+		    document.getElementById("dialog_remove_button").style.visibility="visible";
+		}else if(document.getElementById("dialog_remove_button").style.visibility=="visible"){
+			document.getElementById("dialog_subscribe_button").style.visibility="visible";
+		    document.getElementById("dialog_remove_button").style.visibility="hidden";
+		}
+		
+     }
+}
+
+function cateKeyRight(){
+	//alert("cateKeyRight");
+	if(left_focus_flag==1){
+		if(length>0 && document.getElementById("unsubscribe").style.visibility =="visible"){
+			focus_left_index_blr(left_focus_index);
+			textScroll(-1);
+			left_focus_flag=0;
+			if(document.getElementById("unsubscribe").style.visibility =="visible"){
+					document.getElementById("unsubscribe_focus").style.visibility="visible";
+			}
+			
+		}
+     }else if(document.getElementById("dialog_subscribe").style.visibility=="visible"){
+		if(document.getElementById("dialog_subscribe_button").style.visibility=="visible"){
+			document.getElementById("dialog_subscribe_button").style.visibility="hidden";
+		    document.getElementById("dialog_remove_button").style.visibility="visible";
+		}else if(document.getElementById("dialog_remove_button").style.visibility=="visible"){
+			document.getElementById("dialog_subscribe_button").style.visibility="visible";
+		    document.getElementById("dialog_remove_button").style.visibility="hidden";
+		}
+		
+     }
+}
+
+function hide_single_point(){
+	document.getElementById("dialog_unsubscribe").style.visibility = "hidden";
+}
+
+function cateKeyOK(){
+    if(document.getElementById("unsubscribe_focus").style.visibility=="visible"){
+	  var nowURLa = istart+left_focus_index; 
+	  /*if(product['productida'][nowURLa]=="0"){
+		  document.getElementById("dialog_unsubscribe").style.visibility = "visible";
+		  document.getElementById("unsubscribe_info").innerHTML = "该产品包为单点包，有效期至"+product['endtimea'][nowURLa]+"，到期自动退订！";
+		  setTimeout("hide_single_point()",3000);
+	  }else{*/
+	   showDialogPic();
+	   document.getElementById("unsubscribe_focus").style.visibility="hidden";
+	   document.getElementById("dialog_subscribe").style.visibility="visible";
+	   document.getElementById("dialog_subscribe_button").style.visibility="visible";
+	  //}
+	}else if(document.getElementById("dialog_subscribe").style.visibility=="visible"){
+		if(document.getElementById("dialog_subscribe_button").style.visibility=="visible"){
+			document.getElementById("dialog_subscribe").style.visibility="hidden";
+			document.getElementById("dialog_subscribe_button").style.visibility="hidden";
+			load_subscribe_result();
+			//if(0==1){
+		//alert("111111aaaa");
+	      // document.getElementById("dialog_ordered_failed").style.visibility="visible";
+//	       set_back_time();
+//	       }else{
+		//alert("22333wssss");
+	     // document.getElementById("dialog_ordered").style.visibility="visible";
+//	       set_play_time();
+//	      }
+			
+		}else if(document.getElementById("dialog_remove_button").style.visibility=="visible"){
+			//left_focus_flag=1;
+			document.getElementById("dialog_subscribe").style.visibility="hidden";
+			document.getElementById("dialog_remove_button").style.visibility="hidden";
+			document.getElementById("unsubscribe_focus").style.visibility = "visible";
+			
+		}
+	}
+
+}
+
+function load_subscribe_result(){
+	//alert("22222222222");
+	var nowURL = istart+left_focus_index; 
+    var requestUrl = "action/selfcare_subscribe.jsp?ProductID="+month_orderLsit[nowURL].productID+"&Action=2&PurchaseType=0";
+    var loaderSearch = new net.ContentLoader(requestUrl, show_subscribe_result);
+
+}
+
+function show_subscribe_result(){
+	var results = this.req.responseText;
+    catedata = eval("(" + results + ")");
+	subscribe_result = catedata.subscribe_flag;
+	if(1==subscribe_result){
+	 document.getElementById("dialog_subscribe_success").style.visibility="visible";
+	 set_refresh_time();
+	}else if(-1==subscribe_result){//重复退订
+	 document.getElementById("dialog_subscribe_failed").style.visibility="visible";
+	 document.getElementById("dialog_subscribe_failed_remark").innerHTML="该产品已退订！";
+	 set_back_time();
+	}else{
+	 document.getElementById("dialog_subscribe_failed").style.visibility="visible";
+	 document.getElementById("dialog_subscribe_failed_remark").innerHTML="退订失败！";
+	 set_back_time();
+	}
+	
+}
+
+function set_back(){
+	document.getElementById("dialog_subscribe_failed").style.visibility="hidden";
+	document.getElementById("unsubscribe_focus").style.visibility="visible";
+	
+}
+function set_back_time(){
+	setTimeout("set_back()",2000);
+}
+function set_refresh_time(){
+	setTimeout("refresh_page()",2000);
+}
+function refresh_page(){
+	top.mainWin.document.location ="selfcare_record_ppv.jsp";
+}
+function init_focus(){
+	focus_left_index(left_focus_index);
+	textScroll(1);
+}
+
+function focus_left_index(focus_id){
+	if(parseInt(month_orderLsit[left_focus_index+istart].payDitch)==1){//微信支付
+			document.getElementById("unsubscribe").style.visibility ="hidden";
+	}else{
+		document.getElementById("unsubscribe").style.visibility ="visible";	
+	}
+	
+  document.getElementById("select_order_product_"+focus_id).src="images/portal/focus.png";
+}
+function blur_left_index(focus_id){
+	document.getElementById("select_order_product_"+focus_id).src="images/btn_trans.gif";
+}
+function focus_left_index_blr(focus_id){
+	document.getElementById("select_order_product_"+focus_id).src="images/vod/btv_column_focus.png";
+}
+function page_up_down(){
+	//alert("page_up_down");
+	if(pageSeq>0){
+	document.getElementById("button_up").style.visibility ="visible";
+	}else{
+	document.getElementById("button_up").style.visibility ="hidden";
+	}
+	if(pageSeq+1<pageCount){
+	document.getElementById("button_down").style.visibility ="visible";
+	}else{
+	document.getElementById("button_down").style.visibility ="hidden";
+	}
+
+}
+function page_next(){
+	if(pageCount>1){
+	pageSeq++;
+	if(pageSeq<pageCount){
+		istart = pageSeq*5;
+		if(pageSeq+1==pageCount){
+			iend = length;
+		}else{
+            iend = (pageSeq+1)*5;
+		}
+	}else{
+		pageSeq=0;
+		istart = 0;
+		iend = 5;
+	}
+	}
+	page_up_down();
+}
+function page_prev(){
+	if(pageCount>1){
+	pageSeq--;
+	if(pageSeq>=0){
+		istart = pageSeq*5;
+		iend = (pageSeq+1)*5;
+	}else{
+		pageSeq=pageCount-1;
+		istart = pageSeq*5;
+		iend =length;
+	}
+	}
+	page_up_down();
+}
+function textScroll(doi) {
+    try{
+        if (doi == 1) {
+            scrollString("package_name_" + left_focus_index, month_orderLsit[left_focus_index+istart].productName, 32, 200);
+        }
+        if (doi == -1) {
+            stopscrollString("package_name_" + left_focus_index, month_orderLsit[left_focus_index+istart].productName, 32, 200);
+        }
+    }catch(e){
+        alert("SSSSSSSSSSSSSSStextScroll!!!");
+    }
+}
+function load_allData(){
+
+	var ajaxTimeoutTest = $.ajax({
+　　url:"http://210.13.0.139:8080/iptv_tpp/order/getOrderRelation?ditch=9999&userID="+userID, //请求的URL
+　　timeout : 1000, //超时时间设置，单位毫秒
+　　type : 'get',  //请求方式，get或post
+　　dataType:'json',//返回的数据格式
+    async : false, //同步
+　　success:function(data){ //请求成功的回调函数
+　　　
+		if(data.orderList.length>0){
+			getOrderList(data.orderList);
+			length=month_orderLsit.length;	
+		}
+		
+          if(length >0){
+			
+			 pageCount=Math.ceil(length/5);
+		   if(iend>length){iend = length;}
+			show_product_list();
+            
+          }
+		show_product_recommend(0);
+		
+	
+　　},
+	error: function(XMLHttpRequest, textStatus, errorThrown) {
+		//alert(XMLHttpRequest.status);		
+		document.getElementById("timeout_msg").style.visibility="visible";
+		setTimeout("hideouttime()",3000);		
+	},
+　　complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+　　　　if(status=='timeout'){//超时,status还有success,error等值的情况
+ 　　　		
+　　　　　  alert("超时");
+　　　　}
+　　}
+});
+
+}
+function hideouttime(){
+	document.getElementById("timeout_msg").style.visibility="hidden";
+}
+function getOrderList(order_list){
+	var k=0;
+		for(var i=0;i<order_list.length;i++){
+			var isDel=0;
+			if(parseInt(order_list[i].productType)==0){
+				if(parseInt(order_list[i].productID)!=0 && parseInt(order_list[i].productID)!=1 ){//屏蔽不显示的产品包
+						isDel=1;		
+				}
+			
+			}	
+			if(isDel == 1){
+				month_orderLsit[k]=order_list[i];	
+				k++;
+			}
+			
+		}
+	//alert("qq"+month_orderLsit[0]);
+		
+}
+
+
+//根据产品id加载不同的退订图片
+var productIdArr = [
+	{productId:"100321"},//淘影视
+	{productId:"100322"},//淘电影
+	{productId:"100323"}
+];
+
+function showDialogPic(){
+	var nowURL = istart+left_focus_index; 
+	for(var i=0;i<productIdArr.length;i++){
+		if(productIdArr[i].productId == month_orderLsit[nowURL].productID){
+			document.getElementById("dialog_pic").src="images/myrecord/dialog_subscribe_se.png";
+			break;
+		}else{
+			document.getElementById("dialog_pic").src="images/myrecord/dialog_subscribe.png";
+		}
+	}
+}

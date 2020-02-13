@@ -1,0 +1,601 @@
+<%@ page import="com.zte.iptv.epg.util.PortalUtils" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="com.zte.iptv.epg.account.UserInfo" %>
+<%@ page import="com.zte.iptv.epg.util.EpgConstants" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="com.zte.iptv.newepg.datasource.ChannelOneForeshowDataSource" %>
+<%@ page import="com.zte.iptv.epg.web.ChannelForeshowQueryValueIn" %>
+<%@ page import="com.zte.iptv.newepg.datasource.EpgResult" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Vector" %>
+<%@ page import="com.zte.iptv.epg.content.ProgramInfo" %>
+<%@ page import="com.zte.iptv.epg.util.STBKeysNew" %>
+<%@page contentType="text/html; charset=GBK" %>
+<%@taglib uri="/WEB-INF/epgtag.tld" prefix="epg"%>
+<%@include file="inc/words.jsp"%>
+<%
+    String path = PortalUtils.getPath(request.getRequestURI(), request.getContextPath());
+    HashMap param = PortalUtils.getParams(path, "GBK");
+    UserInfo userInfo = (UserInfo) session.getAttribute(EpgConstants.USERINFO);
+
+    String columnId = (String)param.get("column0");
+    String channelId = request.getParameter("channelid");
+    String type=request.getParameter("fast");
+%>
+
+<html>
+    <head>
+        <title>
+
+        </title>
+        <style type="text/css">
+            div{
+                color:#FFFFFF;
+            }
+        </style>
+    </head>
+    <%  String imgRR = "images/vod/btv-02-left.png";
+    String imgPP = "images/vod/btv-02-pause.png";
+    String imgFF = "images/vod/btv-02-right.png";
+    int topRR = 20;
+    int topPP = 15;
+    int topFF = 20;
+
+    if ("RR".equals(type)) {
+        imgRR = "images/vod/btv-02-leftc.png";
+        topRR = 15;
+    } else if ("pause".equals(type)) {
+        imgPP = "images/vod/btv-02-pausec.png";
+        topPP = 10;
+    } else if ("FF".equals(type)) {
+        imgFF = "images/vod/btv-02-rightc.png";
+        topFF = 15;
+    }
+
+%>
+<body bgcolor="transparent" background="" onLoad="pageInit();">
+
+<div style="left:0; top:574;width:1280;height:146; position:absolute;">
+    <div style="left:0; top:0;width:1200;height:146; position:absolute">
+        <img src="images/vod/btv-02-progressbg.png" border="0" width="1280" height="146" alt=""/>
+    </div>
+</div>
+<!--状态图标(快进、快退、暂停)-->
+<div style="left:0; top:574;width:1280;height:146; position:absolute;">
+    <div id="div0" style="left:105; top:<%=topRR%>;width:68;height:68; position:absolute;" align="center">
+        <img id="img0" src="<%=imgRR%>" border="0" alt=""/>
+    </div>
+
+    <div id="div1" style="left:173; top:<%=topPP%>;width:83;height:83; position:absolute;" align="center">
+        <img id="img1" src="<%=imgPP%>" border="0" alt=""/>
+    </div>
+
+    <div id="div2" style="left:258; top:<%=topFF%>;width:68;height:68; position:absolute;" align="center">
+        <img id="img2" src="<%=imgFF%>" border="0" alt=""/>
+    </div>
+</div>
+ <div style="left:1040; top:615;width:80;height:27; position:absolute;font-size:22px;color:#FFFFFF"
+     id="startTimeDiv">
+     </div>
+<div style="left:1110; top:615;width:50;height:27;font-size:22px; position:absolute;color:#FFFFFF" id="endTimeDiv">
+</div>
+<!--快进货快退倍数(2X)-->
+<div align="right" style="left:325; top:590;width:40;height:27;font-size:22px;color:#FFFFFF; position:absolute"
+     id="speedDiv">
+</div>
+<!--进度条-->
+<div style="left:340; top:625;width:4;height:3; position:absolute;" >
+    <img  id="speedBarDiv" src="images/vod/btv-02-progressred.png" width="4" height="3" alt="" >
+</div>
+<div id="icon" style="left:337; top:615;width:26;height:26; position:absolute; ">
+        <img src="images/vod/btv-02-progressico.png" alt="" width="26" height="26" border="0">
+</div>
+<div style="left:375; top:585;width:68;height:33;font-size:22px;position:absolute" id="currentTimeDiv">
+</div>
+
+<!---定时播放-->
+<div id="locdiv" style="left:1050; top:660;width:200;height:31; position:absolute;font-size:20px;">
+    <div  style="left:-60; top:0;width:80;height:28; position:absolute;color:#FFFFFF;">跳转至</div>
+    <div id="loc0" style="left:10; top:0;width:28;height:28; position:absolute;color:#FFFFFF;border:1px solid #333333">00</div>
+    <div style="left:47; top:0;width:30;height:28; position:absolute;color:#FFFFFF;">:</div>
+
+    <div id="loc1" style="left:60; top:0;width:28;height:28; position:absolute;color:#FFFFFF;border:1px solid #333333">00</div>
+
+    <div id="line" style="left:22; top:0;width:30;height:28; position:absolute;font-size:30px;color:#FFFFFF;">
+        ︱
+    </div>
+</div>
+
+<!--收藏提示信息-->
+<div style="left:420px; top:229px;width:568px;height:215px; position:absolute;z-index:2000">
+    <div id="msg" style="left:0px; top:0px;width:394px;height:215px; position:absolute;visibility:hidden;">
+        <div style="left:0px;top:0px;width:394px;height:200px;position:absolute;">
+            <img src="images/vod/btv10-2-bg01.png" alt="" width="394" height="215" border="0"/>
+        </div>
+        <div id="text" style="left:0px;top:70px;width:394px;height:34px;z-index:6;font-size:20px;color:#FFFFFF;position:absolute;" align="center">
+
+        </div>
+        <div  id="closeMsg" style="left:0px;top:160px;width:394px;height:34px;z-index:6;font-size:20px;color:#FFFFFF;position:absolute;" align="center">
+            2秒自动关闭
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script language="javascript">
+      var imgarr = ["images/vod/btv-02-leftc.png","images/vod/btv-02-pausec.png","images/vod/btv-02-rightc.png"];
+    var imgarr1 = ["images/vod/btv-02-left.png","images/vod/btv-02-pause.png","images/vod/btv-02-right.png"];
+    var toparr = [20,15,20];
+    var type="<%=type%>";
+    var speed = 1 ;
+
+    function pagePlayPause() {
+
+	    if(MonitorTimerId != null) {
+	     	top.mainWin.clearTimeout(MonitorTimerId);
+	     	MonitorTimerId = null;
+	    }
+		top.pageResume();
+        top.hideOSD();
+        return false;
+    }
+
+var timer = null;
+      function showMessage(type){
+          if(type == 1){
+              document.getElementById("text").innerHTML = "您输入的时间错误！";
+          }else{
+              document.getElementById("text").innerHTML = "您输入的时间超出范围！";
+          }
+
+          document.getElementById("msg").style.visibility = "visible";
+document.getElementById("closeMsg").style.visibility = "visible";
+          if(timer != null){
+          clearTimeout(timer);
+}
+          timer = setTimeout(closeMessage, 2000);
+      }
+
+      function getNumFromInput(textInput) {
+          var num = -1;
+          if (textInput == "") {
+              num = 0;
+          } else {
+              for (var i = 0; i < textInput.length; i++) {
+                  if (textInput.charAt(i) < "0" || textInput.charAt(i) > "9") {
+                      num = -1;
+                      return num;
+                  }
+              }
+              num = parseInt(textInput, 10);
+          }
+          return num;
+      }
+
+      function closeMessage() {
+          document.getElementById("loc0").innerHTML = "00";
+          document.getElementById("loc1").innerHTML = "00";
+          document.getElementById("text").innerText = "";
+          document.getElementById("msg").style.visibility = "hidden";
+          document.getElementById("closeMsg").style.visibility = "hidden";
+          clearTimeout(timer);
+      }
+
+      function locationPlay()
+      {
+//          var hoursInput = document.getElementById("hoursInput").value;
+//          var minutesInput =document.getElementById("minutesInput").value;
+          var hoursInput = document.getElementById("loc0").innerHTML;
+          var minutesInput = document.getElementById("loc1").innerHTML;
+          if (hoursInput == "" && minutesInput == "")
+          {
+              showMessage(1);
+              return;
+          }
+          var targetHours = getNumFromInput(hoursInput);
+          if (targetHours == -1 || targetHours >= 24)
+          {
+              showMessage(1);
+              return;
+          }
+
+          var targetMinutes = getNumFromInput(minutesInput);
+          if (targetMinutes == -1 || targetMinutes >= 60)
+          {
+              showMessage(1);
+              return;
+          }
+          //    top.jsDebug("input hours = " + targetHours + " and input minutes = " + targetMinutes);
+          if (top.currState == 2)
+          {
+              //20081013T191625.56Z-20081014T101625.56Z
+              var targetDate = "";
+              var inputTime = new Date();
+              inputTime.setHours(parseInt(targetHours));
+              inputTime.setMinutes(parseInt(targetMinutes));
+              top.getTSTVTime();
+              var beginHourInt = top.TSTVBeginTime.getHours();
+              var endHourInt = top.TSTVEndTime.getHours();
+
+              if ((beginHourInt > endHourInt || beginHourInt == endHourInt) && targetHours > endHourInt)
+              {
+                  inputTime.setTime(inputTime.getTime() - 24 * 3600 * 1000);
+              }
+
+              var TSBeginTimeM = parseInt(top.TSTVBeginTime.getTime() / 60000);
+              var inputTimeM = parseInt(inputTime.getTime() / 60000);
+              var TSEndTimeM = parseInt(top.TSTVEndTime.getTime() / 60000);
+              if (TSBeginTimeM <= inputTimeM && inputTimeM <= TSEndTimeM){
+                  inputTime.setTime(inputTime.getTime() + inputTime.getTimezoneOffset() * 60 * 1000);
+                  var year = inputTime.getFullYear() + "";
+                  var month = top.formatStr(inputTime.getMonth() + 1);
+                  var day = top.formatStr(inputTime.getDate());
+                  targetHours = top.formatStr(inputTime.getHours());
+                  targetMinutes = top.formatStr(inputTime.getMinutes());
+                  targetDate = year + month + day + "T" + targetHours + targetMinutes + "00Z";
+                  top.mp.playByTime(2, targetDate, 1);
+//                  pageDisableWithTimer();
+                  top.jsHideOSD();
+              }else{
+                  showMessage(2);
+              }
+          }
+      }
+
+      function onkeypress(evt) {
+          var keyCode = parseInt(evt.which);
+        //  alert("SSSSSSSSSSSSSSSSSSSSSSonkeypress="+keyCode);
+          if (keyCode == 0x0028) { }//onKeyDown
+          else if (keyCode == 0x0026) { } //onKeyUp
+          else if (keyCode == 0x0025) { //onKeyLeft
+              onLeft();
+          } else if (keyCode == 0x0027) { //onKeyRight
+              onRight();
+          }else if (keyCode == 0x000D) {  //OK
+              locationPlay();
+           }else if (keyCode == 0x0022) {  //remotePlayNext
+              playNext();
+          }else if (keyCode == 0x0021) {  //remotePlayLast
+              playLast();
+          }else if (keyCode == 0x0008 || keyCode == 24) {  //back
+//              pageOnKeyOK();
+              return false;
+          }else if (keyCode >= 0x30 && keyCode <= 0x39){
+              onKeyNumChar(keyCode);
+          }else {
+              top.doKeyPress(evt);
+              return true;
+          }
+          return false;
+      }
+
+      var index = 0;
+      var leftarr = [22,72]
+
+      function onLeft() {
+          if (index > 0 && index <= 1) {
+              var str=document.getElementById("loc"+index).innerHTML;
+              if(str.length<1){
+                  document.getElementById("loc"+index).innerHTML = "0"+str;
+              }
+              index--;
+              document.getElementById("line").style.left = leftarr[index];
+          }
+      }
+      function onRight() {
+          if (index >= 0 && index < 1) {
+              var str=document.getElementById("loc"+index).innerHTML;
+              if(str.length<1){
+                  document.getElementById("loc"+index).innerHTML = "0"+str;
+              }
+              index++;
+              document.getElementById("line").style.left = leftarr[index];
+          }
+      }
+
+      function onKeyNumChar(keyCode) {
+          var channelNum = keyCode - 0x30;
+          var value = document.getElementById("loc" + index).innerHTML;
+        //  alert("SSSSSSSSSSSSindex_value="+index+"_"+value);
+          if (value.length == 2) {
+              document.getElementById("loc" + index).innerHTML = "";
+              document.getElementById("loc" + index).innerHTML = checkNum(channelNum);
+//              if(index==0){
+//                  index=1;
+//                  document.getElementById("line").style.left = leftarr[1];
+//              }
+          } else {
+              document.getElementById("loc" + index).innerHTML += channelNum;
+//              if (index < 1) {
+//                  index++;
+//                  document.getElementById("line").style.left = leftarr[index];
+//              }
+          }
+      }
+
+      function checkNum(num) {
+//          if (index == 0) {
+//              return "0"+num;
+//          } else if (index == 1) {
+//              if (parseInt(num) <= 5) {
+//                  return parseInt(num);
+//              }else{
+//                  return "0"+parseInt(num);
+//              }
+//          }
+          if(index ==0){
+              if (parseInt(num) <= 2) {
+                  return parseInt(num);
+              }else{
+                  return "0"+parseInt(num);
+              }
+          }else if (index == 1 ) {
+              if (parseInt(num) <= 5) {
+                  return parseInt(num);
+              }else{
+                  return "0"+parseInt(num);
+              }
+          }
+          return "00";
+      }
+
+    function pageOnKeyOK() {
+        pagePlayPause();
+    }
+
+    function pageFastForword() {
+        var isFF=false;
+        if(type=="RR" || type=="pause"){
+            isFF=true;
+        }else{
+            isFF=false;
+        }
+	  /*  if(type == "pause") {
+
+	    	top.mainWin.clearTimeout(refreshTimerId);
+	    	refreshTimerId = top.mainWin.setTimeout("setRefreshBarTimer()", 1000);
+	    }*/
+        type = "FF";
+        speed = top.getStbPlaySpeed();
+        if (speed <= 0 || speed == 64) {
+            speed = 2;
+        } else {
+            speed = speed * 2;
+        }
+      	top.doFastForward(speed);
+        top.mainWin.document.all.speedDiv.innerHTML = speed + "X";
+        if(speed==2 && isFF==true){
+            changeImg(2, 15);
+        }
+    }
+
+
+    function pageFastRewind() {
+        var isRR=false;
+        if(type="FF" || type=="pause"){
+            isRR=true;
+        }else{
+            isRR=false;
+        }
+	   /* if(type == "pause") {
+
+	    	top.mainWin.clearTimeout(refreshTimerId);
+	    	refreshTimerId = top.mainWin.setTimeout("setRefreshBarTimer()", 1000);
+	    }*/
+        type = "RR";
+        speed = top.getStbPlaySpeed();
+        if (speed >= 0 || speed == -64) {
+            speed = -2;
+        } else {
+            speed = speed * 2;
+        }
+        var nowspeed = -speed;
+        if (window.navigator.appName == "ztebw") {
+            speed = -speed;
+        }
+        top.mainWin.document.all.speedDiv.innerHTML =  nowspeed + "X" ;
+        if(nowspeed==2 && isRR==true){
+            changeImg(0, 15);
+        }
+	   	top.doFastRewind(speed);
+    }
+
+
+    function pageVODSpeedInitStartAndEnd() {
+        var beginTime = top.TSTVBeginTime;
+        var endTime = top.TSTVEndTime;
+
+        top.jsDebug("SSSSSSSSSSSSSSSSSSSpageVODSpeedInitStartAndEnd_beginTime="+new Date(beginTime));
+        top.jsDebug("SSSSSSSSSSSSSSSSSSSpageVODSpeedInitStartAndEnd_endTime="+new Date(endTime));
+
+        var beginTimeHour = top.formatStr(beginTime.getHours());
+        var beginTimeMin = top.formatStr(beginTime.getMinutes());
+//        var beginTimeAmOrPm=parseInt(beginTimeHour)>11?"pm":"am";
+        var beginHourMin = beginTimeHour+":"+beginTimeMin;
+        var endTimeHour = top.formatStr(endTime.getHours());
+        var endTimeMin = top.formatStr(endTime.getMinutes());
+//        var endTimeAmOrPm=parseInt(endTimeHour)>11?"pm":"am";
+        var endTimeHourMin = endTimeHour+":"+endTimeMin;
+        top.mainWin.document.all.startTimeDiv.innerText = beginHourMin+ " / ";
+        top.mainWin.document.all.endTimeDiv.innerText = endTimeHourMin;
+    }
+    var MonitorTimerId = null;
+    function setMonitorTimer() {
+        MonitorTimerId = null;
+        var state = top.getStatus();
+        if(state == "Normal Play") {
+//            alert("==============hahah");
+            top.hideOSD();
+        }
+    }
+    function clearMonitorTimer() {
+        if(MonitorTimerId != null) {
+            top.mainWin.clearTimeout(MonitorTimerId);
+            MonitorTimerId = null;
+        }
+    }
+
+    function setRefreshBarTimer() {
+	 	var currTime = parseInt(top.jsGetCurrentPlayTime());
+        if (currTime == -1) {
+        refreshTimerId = top.mainWin.setTimeout("setRefreshBarTimer()", 1000);
+            return false;
+        }
+        pageRefreshBarState();
+        if(type == "pause") {
+            refreshTimerId = top.mainWin.setTimeout("setRefreshBarTimer()", 1000);
+        } else {
+            refreshTimerId = top.mainWin.setTimeout("setRefreshBarTimer()", 1000);
+        }
+   }
+
+
+    function pageRefreshBarState() {
+        top.jsDebug("SSSSSSSSSSSSSSpageRefreshBarState_top.currState="+top.currState);
+	    if(top.currState == 2 || top.currState == 4) {
+		    top.getTSTVTime();
+		    pageVODSpeedInitStartAndEnd();
+            var PlaySpeed = top.getStbPlaySpeed();
+            var TSTVPlayTime = top.TSTVCurrentTime.getTime()+PlaySpeed*1000;
+            var TSBeginTimeM = top.TSTVBeginTime.getTime();
+            var TSEndTimeM = top.TSTVEndTime.getTime();
+
+            top.jsDebug("SSSSSSSSSSSSSSSSSSpageRefreshBarState_PlaySpeed="+PlaySpeed);
+            top.jsDebug("SSSSSSSSSSSSSSSSSSpageRefreshBarState_type="+type);
+            top.jsDebug("SSSSSSSSSSSSSSSSSSpageRefreshBarState_TSTVCurrentTime="+new Date(top.TSTVCurrentTime));
+            top.jsDebug("SSSSSSSSSSSSSSSSSSpageRefreshBarState_top.TSTVBeginTime="+new Date(top.TSTVBeginTime));
+            top.jsDebug("SSSSSSSSSSSSSSSSSSpageRefreshBarState_top.TSTVEndTime="+new Date(top.TSTVEndTime));
+
+//              alert("=============TSBeginTimeM"+TSBeginTimeM);
+//              alert("=============TSTVPlayTime"+TSTVPlayTime);
+//              alert("=============TSEndTimeM"+TSEndTimeM);
+            if(type == "pause") {
+                TSTVPlayTime = top.TSTVCurrentTime.getTime();
+            } else if (TSTVPlayTime > TSEndTimeM && type == "FF") {
+//                  alert("=========caca====TSTVPlayTime"+TSTVPlayTime);
+			    clearMonitorTimer();
+                top.doGoToEnd();
+                top.jsHideOSD();
+                return false;
+            } else if (TSTVPlayTime < TSBeginTimeM && type == "RR") {
+//                alert("=========haha====TSTVPlayTime"+TSTVPlayTime);
+//                alert("=============TSBeginTimeM"+TSBeginTimeM);
+			    clearMonitorTimer();
+                top.doGoToStart();
+                top.jsHideOSD();
+                return false;
+            }
+            var currentPlayTime = new Date(TSTVPlayTime);
+            var currentHours = top.formatStr(currentPlayTime.getHours());
+            var currentMinutes = top.formatStr(currentPlayTime.getMinutes());
+//            var curAmOrPm=parseInt(currentHours)>11?"pm":"am";
+            top.mainWin.document.all.currentTimeDiv.innerText=currentHours+":"+currentMinutes;
+            var beginToCurrTime = TSTVPlayTime - TSBeginTimeM;
+            var beginToEndTime = TSEndTimeM - TSBeginTimeM;
+//             alert("=======beginToEndTime========beginToEndTime"+beginToEndTime);
+//             alert("=======beginToCurrTime========beginToCurrTime"+beginToCurrTime);
+            var tempLength = parseInt(680 * beginToCurrTime / beginToEndTime);
+              if (tempLength == 0)
+        {
+            top.mainWin.document.all.speedBarDiv.style.width = 1;
+            top.mainWin.document.all.icon.style.left = 337;
+        }
+        else if (tempLength >= 680)
+        {
+            top.mainWin.document.all.speedBarDiv.style.width = 680;
+            top.mainWin.document.all.icon.style.left = tempLength+333;
+        }
+        else
+        {
+            top.mainWin.document.all.speedBarDiv.style.width = tempLength;
+            top.mainWin.document.all.icon.style.left = tempLength+333;
+        }
+        }
+    }
+    function changeImg(index, topvalue) {
+        for (var i = 0; i < 3; i++) {
+            if (i == index) {
+                top.mainWin.document.getElementById("img" + i).src = imgarr[i];
+                top.mainWin.document.getElementById("div" + i).style.top = topvalue;
+            } else {
+                top.mainWin.document.getElementById("img" + i).src = imgarr1[i];
+                top.mainWin.document.getElementById("div" + i).style.top = toparr[i];
+            }
+        }
+    }
+    function pageInit() {
+		pageVODSpeedInitStartAndEnd();
+
+        if (type == "FF"){
+//            top.mainWin.document.all.stateImg.src = "images/liveTV/jin.png";
+            top.mainWin.document.all.speedDiv.innerHTML = "2X";
+        } else if(type == "RR") {
+//            top.mainWin.document.all.stateImg.src = "images/liveTV/tui.png";
+            top.mainWin.document.all.speedDiv.innerHTML = "2X";
+        } else if(type == "pause") {
+//   	 	    top.mainWin.document.all.stateImg.src = "images/liveTV/pause.png";
+   	 	    top.mainWin.document.all.speedDiv.innerHTML = "";
+   	    }
+
+        top.jsSetupKeyFunction("top.mainWin.pageFastRewind", 0x0109);
+        top.jsSetupKeyFunction("top.mainWin.pageFastForword", 0x0108);
+        top.jsSetupKeyFunction("top.mainWin.pageOnKeyOK", 0x000d);
+        top.jsSetupKeyFunction("top.mainWin.pageOnKeyOK", 8);
+        top.jsSetupKeyFunction("top.mainWin.pagePlayPause", 0x0107);
+
+        setRefreshBarTimer();
+   	    MonitorTimerId = top.mainWin.setTimeout("setMonitorTimer()", 5000);
+    }
+
+    function pageResume() {
+//        if(top.isPlay() == true) {
+            top.pageResume();
+            top.mainWin.document.location="portal.jsp?onlymenu=1";
+            top.showOSD(2, 0, 0);
+            top.setBwAlpha(0);
+            return false;
+//        }
+    }
+ function playLast(){
+          if(top.currState == 2)
+          {
+              top.getTSTVTime();
+              var TSTVCurrentTimeM = parseInt(top.TSTVCurrentTime.getTime()/1000);
+              var TSTVBeginTimeM = parseInt(top.TSTVBeginTime.getTime()/1000);
+              if(TSTVCurrentTimeM > TSTVBeginTimeM)
+              {
+                  top.doGoToStart();
+                  if(top.ippvObject.isIPPVChannel(top.channelInfo.currentChannel))
+                  {
+                      top.jsIPPVLocatePlay(channelInfo.currentChannel);
+                  }
+              }
+          }else{
+              top.remotePlayLast();
+          }
+          return false;
+      }
+
+      function playNext(){
+          if(top.currState == 2 || top.currState ==5)
+          {
+              top.doGoToEnd();
+              if(top.ippvObject.isIPPVChannel(top.channelInfo.currentChannel))
+              {
+                  top.jsIPPVLocatePlay(top.channelInfo.currentChannel);
+              }
+          }else{
+              top.remotePlayNext();
+          }
+          return false;
+      }
+    top.jsSetupKeyFunction("top.mainWin.pageResume", <%=STBKeysNew.remoteMenu%>);
+    top.jsSetupKeyFunction("top.mainWin.pageResume", 36);
+
+//    document.onkeypress = top.doKeyPress;
+    document.onkeypress = onkeypress;
+    focus();
+</script>
+</html>

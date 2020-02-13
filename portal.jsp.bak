@@ -1,0 +1,555 @@
+<%@	page contentType="text/html; charset=GBK" %>
+<%@ page import="com.zte.iptv.epg.util.PortalUtils" %>
+<%@ page import="com.zte.iptv.epg.util.EpgUtils" %>
+<%@ page import="com.zte.iptv.platformepg.account.CriteriaChannelInfo" %>
+<%@ page import="com.zte.iptv.platformepg.content.PlatformepgCacheManager" %>
+<%@ page import="com.zte.iptv.epg.account.UserInfo" %>
+<%@ page import="com.zte.iptv.newepg.datasource.ColumnDataSource" %>
+<%@ page import="com.zte.iptv.epg.web.ColumnValueIn" %>
+<%@ page import="com.zte.iptv.newepg.datasource.EpgResult" %>
+<%@ page import="com.zte.iptv.epg.content.ColumnInfo" %>
+<%@ page import="java.util.*" %>
+<%@ page import="com.zte.iptv.newepg.datasource.ColumnOneDataSource" %>
+<%@ include file="inc/getFitString.jsp" %>
+<%@ taglib uri="/WEB-INF/epgtag.tld" prefix="epg" %>
+<%@ include file="inc/chan_addjsset.jsp" %>
+<epg:PageController name="portal.jsp"/>
+<%!
+
+    public  String loadConvert (char[] in, int off, int len, char[] convtBuf) {
+      if (convtBuf.length < len) {
+          int newLen = len * 2;
+          if (newLen < 0) {
+              newLen = Integer.MAX_VALUE;
+         }
+          convtBuf = new char[newLen];
+      }
+      char aChar;
+      char[] out = convtBuf;
+      int outLen = 0;
+      int end = off + len;
+
+     while (off < end) {
+          aChar = in[off++];
+          if (aChar == '\\') {
+             aChar = in[off++];
+              if(aChar == 'u') {
+                 // Read the xxxx
+                  int value=0;
+                  for (int i=0; i<4; i++) {
+                      aChar = in[off++];
+                     switch (aChar) {
+                       case '0': case '1': case '2': case '3': case '4':
+                        case '5': case '6': case '7': case '8': case '9':
+                           value = (value << 4) + aChar - '0';
+                           break;
+                        case 'a': case 'b': case 'c':
+                        case 'd': case 'e': case 'f':
+                          value = (value << 4) + 10 + aChar - 'a';
+                           break;
+                        case 'A': case 'B': case 'C':
+                        case 'D': case 'E': case 'F':
+                          value = (value << 4) + 10 + aChar - 'A';
+                           break;
+                        default:
+                            throw new IllegalArgumentException(
+                                         "Malformed \\uxxxx encoding.");
+                      }
+                   }
+                  out[outLen++] = (char)value;
+              } else {
+                  if (aChar == 't') aChar = '\t';
+                  else if (aChar == 'r') aChar = '\r';
+                  else if (aChar == 'n') aChar = '\n';
+                  else if (aChar == 'f') aChar = '\f';
+                  out[outLen++] = aChar;
+              }
+          } else {
+              out[outLen++] = (char)aChar;
+          }
+      }
+      return new String (out, 0, outLen);
+    }
+
+    String getChinese(HashMap param, String name){
+        String value = (String)param.get(name);
+        if(value != null ){
+           value = loadConvert(value.toCharArray(),0,value.length(),new char[0]);
+        }
+        return value;
+    }
+
+
+    String replaceUrl(HttpServletRequest req,String url){
+        UserInfo userInfo = (UserInfo)req.getSession().getAttribute(EpgConstants.USERINFO);
+          if(url !=null){
+              url = url.replaceAll("\\{userid\\}", userInfo.getUserId());
+              url = url.replaceAll("\\{userId\\}",  userInfo.getUserId());
+              return url;
+          }
+          return "";
+    }
+
+%>
+<html>
+<head>
+    <title>portal</title>
+</head>
+<%!
+   public String getColumnList(UserInfo userinfo,String columnid,HashMap param){
+       StringBuffer sb = new StringBuffer("[");
+       try{
+            String isFathercolumn = String.valueOf(param.get("isFathercolumn"));
+            String Fathercolumn = String.valueOf(param.get("Fathercolumn"));
+            List vColumnData=new ArrayList();
+            List tempList=new ArrayList();
+            if (isFathercolumn != null && Fathercolumn != null && isFathercolumn.equals("1")) {//读取N个一级栏目分支
+                String[] columnlist = Fathercolumn.split(",");
+                int columnLength = columnlist.length;
+                for (int i = 0; i < columnLength; i++) {
+                        ColumnOneDataSource vodDs = new ColumnOneDataSource();
+                        ColumnValueIn valueIn = (ColumnValueIn) vodDs.getValueIn();
+                        valueIn.setUserInfo(userinfo);
+                        valueIn.setColumnId(columnlist[i]);
+                        EpgResult result = vodDs.getData();
+                        tempList=result.getDataAsVector();
+                        if(tempList!=null){
+                         vColumnData.addAll(tempList);
+                        }
+                }
+            } else {
+                ColumnDataSource columnDs = new ColumnDataSource();
+                ColumnValueIn valueIn = (ColumnValueIn) columnDs.getValueIn();
+                valueIn.setUserInfo(userinfo);
+                valueIn.setColumnId(columnid);
+                EpgResult result = columnDs.getData();
+                vColumnData = (Vector) result.getData();
+            }
+            String oColumnid = "";
+            String oColumnName = "";
+            String columnposter="";
+            int length = vColumnData.size();
+            ColumnInfo columnInfo = null;
+            for(int i=0; i<length; i++){
+                if(i>0){
+                   sb.append(",");
+                }
+
+             columnInfo = (ColumnInfo)vColumnData.get(i);
+             columnposter=columnInfo.getNormalPoster();
+             oColumnid  = columnInfo.getColumnId();
+             oColumnName  = columnInfo.getColumnName();
+//                 System.out.println("==============oColumnid=========="+oColumnid);
+             sb.append("{columnid:\""+oColumnid+"\",");
+             sb.append("columnposter:\""+columnposter+"\",");
+             sb.append("columnname:\""+oColumnName+"\"}");
+            }
+
+
+       }catch (Exception e){
+           System.out.println("+++++++++栏目列表数据源出错++++");
+       }
+       sb.append("]");
+       return sb.toString();
+   }
+%>
+
+<%
+     String path = com.zte.iptv.epg.util.PortalUtils.getPath(request.getRequestURI(), request.getContextPath());
+     HashMap param = PortalUtils.getParams(path, "GBK");
+     String TIME_COUNT=String.valueOf(param.get("TIME_COUNT"));
+     String INTERVAL=String.valueOf(param.get("INTERVAL"));
+     String channelColumnid=String.valueOf(param.get("column00"));
+     String vodColumnid = String.valueOf(param.get("column01"));
+     String isMultiWindow = String.valueOf(param.get("isMultiWindow"));
+
+     String name0=getChinese(param,"app_0_name");
+     String name1=getChinese(param,"app_1_name");
+     String name2=getChinese(param,"app_2_name");
+     String name3=getChinese(param,"app_3_name");
+
+     String lastfocus = request.getParameter("lastfocus");
+    System.out.println("fanhui de bushi lastfocus===="+lastfocus);
+     int bottomMenuIndex = 3;
+     int leftMenuIndex = 0;
+     int startIndex=0;
+     int endIndex=7;
+     int destpage=1;
+     if(lastfocus != null && !"".equals(lastfocus)){
+         try{
+             String[] indexs = lastfocus.split("_");
+             if(indexs!=null && indexs.length>0){
+                   bottomMenuIndex=Integer.parseInt(indexs[0]);
+                   leftMenuIndex =Integer.parseInt(indexs[1]);
+                   if(indexs.length > 2){
+                      startIndex=Integer.parseInt(indexs[2]);
+                      endIndex=Integer.parseInt(indexs[3]);
+                   }
+             }
+             //bottomMenuIndex = Integer.parseInt(lastfocus);
+         }catch(Exception e){
+             System.out.println("fanhui de bushi bottomMenuIndex");
+         }
+     }
+
+    //将开机频道混排号取出来
+
+    UserInfo userInfo = (UserInfo) pageContext.getSession().getAttribute(EpgConstants.USERINFO);
+    String channelid = userInfo.getCrtChannelID();
+
+    Hashtable criHash = null;
+    criHash = PlatformepgCacheManager.getSingleton().getchannelInfoHash();
+    int tempno = -1;
+
+    if (criHash != null) {
+        Vector v_fun = (Vector) criHash.get(userInfo.getVendorid());
+        CriteriaChannelInfo chInfo_fun = null;
+
+        if (v_fun != null && v_fun.size() > 0) {
+            for (int i = 0; i < v_fun.size(); i++) {
+                chInfo_fun = (CriteriaChannelInfo) v_fun.get(i);
+
+                if (null != chInfo_fun && chInfo_fun.getChannelid().equals(channelid)) {
+                    tempno = EpgUtils.toInt(chInfo_fun.getUserchannelid(), -1);
+                    break;
+                }
+            }
+        }
+    }
+
+    //专题子栏目列表数据源
+    String column02=(String)param.get("column02");
+    String columnStr = getColumnList(userInfo,column02,param);
+
+    UserInfo timeUserInfo = (UserInfo) request.getSession().getAttribute(EpgConstants.USERINFO);
+    String timePath1 = request.getContextPath();
+    String timeBasePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + timePath1 + "/";
+    String timeFrameUrl = timeBasePath + timeUserInfo.getUserModel();
+//    System.out.println("+++portal_columnStr="+columnStr);
+
+    String fromplay = request.getParameter("fromplay");
+    if(fromplay==null){
+        fromplay = "";
+    }
+
+%>
+
+<body bgcolor="transparent" >
+<script language="javascript" type="">
+    var fromthirdback  = ztebw.getAttribute("fromthirdback");
+   //alert("SSSSSSSSSSSSSSSSSSSSfromthirdback="+fromthirdback+"_"+top.isPlay()+"_"+top.channelInfo.lastChannel+"_"+top.channelInfo.currentChannel);
+
+    if(fromthirdback == "1" || ("<%=fromplay%>"!=1 && top.isPlay()==false)){
+        var curMixno = ztebw.getAttribute("curMixno");
+        if(fromthirdback == "1"){
+            ztebw.setAttribute("fromthirdback",'0');
+        }else{
+            curMixno = top.channelInfo.currentChannel;
+            if((!curMixno && curMixno!=0) || curMixno<0 || curMixno ==""){
+                curMixno = top.channelInfo.lastChannel;
+            }
+        }
+
+       // alert("SSSSSSSSSSSSSSSSSSSScurMixno="+curMixno);
+        if(top.channelInfo.currentChannel == top.channelInfo.lastChannel){
+            top.setDefaulchannelNo();
+        }
+        top.jsRedirectChannel(curMixno);
+        top.setTimeout(function(){
+//            alert("SSSSSSSSSSSSSSSSSSSSSZHIXINGLE!!!!");
+            top.mainWin.document.location='<%=timeFrameUrl+"/portal.jsp?fromplay=1"%>';
+            top.showOSD(2, 0, 25);
+            top.setBwAlpha(0);
+        },1000)
+    }
+</script>
+ <%--左侧的大的div--%>
+ <div style="background:url('images/portal/bg_portal_left.png'); position:absolute; width:227px; height:483px; left:80px; top:87px; font-size:22px;color:#FFFFFF; line-height:51px;" align="center">
+      <div id='up' style="background:url('images/vod/btv_up.png'); position:absolute; width:24px; height:14px; left:95px; top:73px; " >
+      </div>
+      <div id='down' style="background:url('images/vod/btv_down.png'); position:absolute; width:24px; height:14px; left:95px; top:456px; " >
+      </div>
+
+
+      <div id="left_focus_img" style="position:absolute; width:205px; height:51px; left:6px; top:89px;visibility:hidden " >
+          <img id="left_focus_img11" height="51" width="210" src="images/portal/focus.png" />
+      </div>
+     <%
+         for(int i=0; i<7; i++){
+             int topIndex = 90+51*i;
+     %>
+      <div id="left_menu_<%=i%>" style="background:url('images/portal/line2.png') no-repeat bottom; position:absolute; width:205px; height:51px; left:8px; top:<%=topIndex%>px; " >
+
+      </div>
+     <%
+         }
+     %>
+ </div>
+
+ <%--下方菜单展示--%>
+<div style="position:absolute; width:1279px; height:178px; left:0px; top:530px; ">
+    <img src="images/portal/bg_portal_down.png" width="1279" height="178"/>
+</div>
+ <div style="position:absolute; width:1280px; height:200; left:0px; top:480px; font-size:28px;" align="center">
+    <div style="left:-590; top: 100; width: 1; height: 1; position: absolute">
+        <a href="javascript:dotest();" >
+            <img alt="" src="images/btn_trans.gif" width="30" height="30" border="0"/>
+        </a>
+    </div>
+    <div style=" position:absolute; width:116px; height:116px; left:196px; top:59px;">
+        <div id="bottom_menu_focus0" style=" position:absolute; width:116px; height:116px; left:0px; top:0px; visibility:hidden">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>
+    </div>
+     <div style=" position:absolute; width:116px; height:116px; left:308px; top:44px; ">
+         <div id="bottom_menu_focus1" style=" position:absolute; width:116px; height:116px; left:0px; top:-8px;visibility:hidden ">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>
+    </div>
+     <div style=" position:absolute; width:116px; height:116px; left:420px; top:34px;">
+         <div id="bottom_menu_focus2" style=" position:absolute; width:116px; height:116px; left:0px; top:-18px;visibility:hidden ">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>                                           
+    </div>
+     <div  style=" position:absolute; width:116px; height:116px; left:534px; top:26px;">
+         <div id="bottom_menu_focus3" style=" position:absolute; width:116px; height:116px; left:0px; top:-22px;visibility:hidden ">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>
+    </div>
+     <div  style=" position:absolute; width:116px; height:116px; left:642px; top:26px;">
+         <div id="bottom_menu_focus4" style=" position:absolute; width:116px; height:116px; left:0px; top:-18px;visibility:hidden ">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>
+    </div>
+     <div style=" position:absolute; width:116px; height:116px; left:759px; top:34px; ">
+         <div id="bottom_menu_focus5" style=" position:absolute; width:116px; height:116px; left:0px; top:-18px; visibility:hidden">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>
+    </div>
+     <div   style=" position:absolute; width:116px; height:116px; left:0px; top:46px; ">
+         <div id="bottom_menu_focus6" style=" position:absolute; width:116px; height:116px; left:867px; top:-8px;visibility:hidden ">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>
+    </div>
+     <div style=" position:absolute; width:116px; height:116px; left:979px; top:62px;">
+         <div id="bottom_menu_focus7" style=" position:absolute; width:116px; height:116px; left:0px; top:0px;visibility:hidden ">
+            <img width="116" height="116" src="images/portal/focus_bottom.png"/>
+        </div>
+    </div>
+    <%--我的tv--%>
+    <div style="position:absolute; width:100px; height:100px; left:204px; top:80px; ">
+        <div id="buttom_0" style="background:url('images/portal/icons/myTV.png'); position:absolute; width:100px; height:100px; left:0px; top:0px; ">
+        </div>
+    </div>
+    <div style="position:absolute; width:100px; height:30px; left:204px; top:70px; ">
+        <div id="bottom_menu_text_0" style=" position:absolute; width:116px; height:30px; left:-8px; top:105px; color:#ffffff;">
+            我的TV
+        </div>
+    </div>
+    <%--回看--%>
+    <div style="position:absolute; width:100px; height:100px; left:316px; top:65px;" >
+        <div id="buttom_1" style="background:url('images/portal/icons/tvod.png'); position:absolute; width:100px; height:100px; left:0px; top:-8px;" >
+        </div>
+	</div>
+     <div  style="position:absolute; width:100px; height:100px; left:316px; top:55px;" >
+        <div id="bottom_menu_text_1" style=" position:absolute; width:116px; height:30px; left:-8px; top:105px; color:#ffffff;">
+             回看
+        </div>
+	</div>
+    <%--点播--%>
+    <div style="position:absolute; width:100px; height:100px; left:428px; top:55px; ">
+        <div id="buttom_2" style="background:url('images/portal/icons/vod.png'); position:absolute; width:100px; height:100px; left:0px; top:-18px; ">
+        </div>
+    </div>
+     <div style=" position:absolute; width:100px; height:100px; left:428px; top:45px; ">
+        <div id="bottom_menu_text_2" style=" position:absolute; width:116px; height:30px; left:-8px; top:105px; color:#ffffff;">
+             点播
+        </div>
+    </div>
+    <%--频道--%>
+    <div  style="position:absolute; width:100px; height:100px; left:542px; top:46px; ">
+        <div id="buttom_3" style="background:url('images/portal/icons/channel.png'); position:absolute; width:100px; height:100px; left:0px; top:-22px; ">
+        </div>
+    </div>
+     <div style=" position:absolute; width:100px; height:100px; left:542px; top:35px; ">
+        <div id="bottom_menu_text_3" style=" position:absolute; width:116px; height:30px; left:-8px; top:105px; color:#ffffff;">
+             频道
+        </div>
+    </div>
+    <%--专题--%>
+    <div style="position:absolute; width:100px; height:100px; left:650px; top:45px; ">
+        <div id="buttom_4" style="background:url('<%=getChinese(param,"app_0_img")%>'); position:absolute; width:100px; height:100px; left:0px; top:-18px; ">
+        </div>
+    </div>
+     <div  style=" position:absolute; width:100px; height:100px; left:650px; top:35px; ">
+        <div id="bottom_menu_text_4" style=" position:absolute; width:116px; height:30px; left:-8px; top:105px; color:#ffffff;">
+            <%=name0%>
+        </div>
+    </div>
+    <%--应用--%>
+    <div style="position:absolute; width:100px; height:100px; left:767px; top:55px; ">
+        <div id="buttom_5" style="background:url('<%=getChinese(param,"app_1_img")%>'); position:absolute; width:100px; height:100px; left:0px; top:-18px; ">
+        </div>
+    </div>
+     <div style="position:absolute; width:100px; height:100px; left:767px; top:45px; ">
+        <div id="bottom_menu_text_5" style=" position:absolute; width:116px; height:30px; left:-8px; top:105px; color:#ffffff;">
+             <%=name1%>
+        </div>
+    </div>
+    <%--社区--%>
+    <div style="position:absolute; width:100px; height:100px; left:875px; top:63px; ">
+        <div id="buttom_6" style="background:url('<%=getChinese(param,"app_2_img")%>'); position:absolute; width:100px; height:100px; left:0px; top:-8px; ">
+        </div>
+    </div>
+     <div style="position:absolute; width:100px; height:100px; left:875px; top:53px; ">
+        <div id="bottom_menu_text_6"  style=" position:absolute; width:116px; height:30px; left:-8px; top:105px; color:#ffffff;">
+             <%=name2%>
+        </div>
+    </div>
+    <%--生活--%>
+    <div  style="position:absolute; width:100px; height:100px; left:987px; top:87px; ">
+        <div id="buttom_7" style="background:url('<%=getChinese(param,"app_3_img")%>'); position:absolute; width:100px; height:100px; left:0px; top:0px; ">
+        </div>
+    </div>
+     <div  style="position:absolute; width:100px; height:100px; left:987px; top:77px; ">
+        <div id="bottom_menu_text_7" style="position:absolute; width:116px; height:30px; left:-8px; top:98px; color:#ffffff;">
+            <%=name3%>
+        </div>
+    </div>
+</div>
+<div  style="position:absolute; width:202px; height:44px; left:85px; top: 92px;">
+  <img src="images/logo.png" alt="" border="0" width="325" height="55" />
+</div>
+
+ <div style="left:460px; top:300px;width:568px;height:215px; position:absolute;z-index:2000">
+    <div id="msg" style="left:0px; top:0px;width:394px;height:215px; position:absolute;visibility:hidden;">
+        <div style="left:0px;top:0px;width:394px;height:200px;position:absolute;">
+            <img src="images/vod/btv10-2-bg01.png" alt="" width="394" height="215" border="0"/>
+        </div>
+        <div id="text"
+             style="left:0px;top:70px;width:394px;height:34px;z-index:6;font-size:20px;color:#FFFFFF;position:absolute;"
+             align="center">
+        </div>
+
+
+        <div id="closeMsg"
+             style="left:0px;top:160px;width:394px;height:34px;z-index:6;font-size:20px;color:#FFFFFF;position:absolute;visibility:hidden;"
+             align="center">
+            2秒自动关闭
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="js/contentloader.js"></script>
+<script language="javascript" type="">
+ var l1 = new Date().getTime();
+
+var backurlparam ="<%=timeFrameUrl%>/portal.jsp";
+var userid="<%=userInfo.getUserId()%>";
+var bottomMenuIndex = <%=bottomMenuIndex%>;
+var leftMenuIndex = <%=leftMenuIndex%>;
+var destpage = <%=destpage%>;
+var channelColumnid = "<%=channelColumnid%>";
+var vodColumnid = "<%=vodColumnid%>";
+var tempno = "<%=tempno%>";
+var startIndex=<%=startIndex%>;
+var endIndex=<%=endIndex%>;
+var channelname1 = '频道导航';
+var tvodchannelname = '回看导航';
+
+var favoriteUrl = "";
+if(isZTEBW == true){
+    favoriteUrl = "vod_favorite_pre.jsp?leefocus=0_0";
+}else{
+    favoriteUrl = "vod_favorite.jsp?leefocus=0_0";
+}
+
+//alert("SSSSSSSSSSSnavigator.appName="+window.navigator.appName+"__isZTEBW="+isZTEBW);
+
+var currentChannel = top.channelInfo.currentChannel;
+//社区相关
+var commarr=[];
+<%
+  int i=0;
+  while(param.get("app_2_"+i+"_name")!=null){
+%>
+commarr[commarr.length]={columnname:'<%=String.valueOf(param.get("app_2_"+i+"_name"))%>',cname:'<%=String.valueOf(param.get("app_2_"+i+"_name"))%>',curl:'<%=replaceUrl(request,String.valueOf(param.get("app_2_"+i+"_url")))%>',cimg:'<%=String.valueOf(param.get("app_2_"+i+"_img"))%>',gosd:'<%=String.valueOf(param.get("app_2_"+i+"_gosd"))%>'};
+<%
+    i++;
+}
+%>
+
+//生活相关
+var lifeArr = [];
+<%
+  i=0;
+  while(param.get("app_3_"+i+"_name")!=null){
+%>
+lifeArr[lifeArr.length]={columnname:'<%=String.valueOf(param.get("app_3_"+i+"_name"))%>',cname:'<%=String.valueOf(param.get("app_3_"+i+"_name"))%>',curl:'<%=replaceUrl(request,String.valueOf(param.get("app_3_"+i+"_url")))%>',cimg:'<%=String.valueOf(param.get("app_3_"+i+"_img"))%>',gosd:'<%=String.valueOf(param.get("app_3_"+i+"_gosd"))%>'};
+<%
+    i++;
+}
+%>
+//应用
+var appArr = [];
+<%
+  i=0;
+  while(param.get("app_1_"+i+"_name")!=null){
+%>
+appArr[appArr.length]={columnname:'<%=String.valueOf(param.get("app_1_"+i+"_name"))%>',cname:'<%=String.valueOf(param.get("app_1_"+i+"_name"))%>',curl:'<%=replaceUrl(request,String.valueOf(param.get("app_1_"+i+"_url")))%>',cimg:'<%=String.valueOf(param.get("app_1_"+i+"_img"))%>',gosd:'<%=String.valueOf(param.get("app_1_"+i+"_gosd"))%>'};
+<%
+    i++;
+}
+%>
+
+var mytvArr = [{tvname:'我的收藏',tvurl:favoriteUrl}
+                 ,{tvname:'节目导视',tvurl:'channel_bytime_pre.jsp?columnid=<%=channelColumnid%>&channelid1='+currentChannel+'&numperpage=10&timecount=<%=TIME_COUNT%>&interval=<%=INTERVAL%>&leefocus=0_1'}
+                 ,{tvname:'我的信箱',tvurl:'mail_message.jsp?leefocus=0_2'}
+                 ,{tvname:'用户设置',tvurl:'setting.jsp?leefocus=0_3'}
+                 ,{tvname:'消费记录',tvurl:'selfcare_myAcount_ppv.jsp?leefocus=0_4'}
+                ];
+var SpecalColumnlist = <%=columnStr%>;
+<%
+  i=0;
+  while(param.get("app_0_"+i+"_name")!=null){
+%>
+SpecalColumnlist[SpecalColumnlist.length] = {columnid:"0",columnname:"<%=String.valueOf(param.get("app_0_"+i+"_name"))%>",columnposter:"<%=replaceUrl(request,String.valueOf(param.get("app_0_"+i+"_url")))%>"};
+<%
+    i++;
+  }
+%>
+var specallength = SpecalColumnlist.length;
+var alsus = "该服务已经收藏";
+var sus = "收藏成功";
+
+var portalUrl ="<%=timeFrameUrl%>/portal.jsp";
+var thirdbackUrl="<%=timeFrameUrl%>/thirdback.jsp";
+</script>
+
+ <%--<%--%>
+     <%--String jsDebugStatus=(String)param.get("jsDebugStatus");--%>
+     <%--if(jsDebugStatus!=null && jsDebugStatus.equals("1")){--%>
+ <%--%>--%>
+    <script language="javascript" type="">
+        <%@ include file="js/portal.js" %>
+        <%@ include file="js/json.js" %>
+
+
+        var l2 = new Date().getTime();
+
+        //alert("SSSSSSSSSSSSSSSSSSSSSSSportal_js_consume="+(l2-l1));
+    </script>
+ <%--<%--%>
+     <%--}else{--%>
+ <%--%>--%>
+    <%--<script type="text/javascript" src="js/portal.js"></script>--%>
+    <%--<script type="text/javascript" src="js/json.js"></script>--%>
+ <%--<%--%>
+     <%--}--%>
+ <%--%>--%>
+
+
+
+ <%@ include file="inc/lastfocus.jsp" %>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="GBK"?>
+
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
+
+<frame_posters>
+	<poster code="portalTop"  desc="portal Top"/>
+	<poster code="miniRight"  desc="mini Right"/>
+	
+	<poster code="guanggao01" desc="第三方链接页面的海报左"/>
+	<poster code="guanggao02" desc="第三方链接页面的海报中"/>
+	<poster code="guanggao03" desc="第三方链接页面的海报右"/>
+	<poster code="guanggao04" desc="频道信息页面的广告"/>
+</frame_posters>

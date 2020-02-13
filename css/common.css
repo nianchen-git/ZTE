@@ -1,0 +1,60 @@
+/* common style */
+.body_bg
+ {
+	margin: 0px;
+	padding: 0px;
+    background-color:transparent;
+	background-image: url(../images/vod/btv_bg.png);
+	background-repeat: no-repeat;
+}
+
+
+#channelList {
+    height: 236px;
+    left: 174px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    top: 325px;
+    width: 219px;
+}
+
+.channelList {
+    color: #FFFFFF;
+    font-size: 22px;
+    font-weight: bold;
+    height: 48px;
+    margin-left: 13px;
+    width: 234px;
+    overflow: hidden;
+}
+
+.program {
+   border-right:1px solid #CCCCCC;
+   /*background:url("image/gride_program_line.png") no-repeat right;*/
+   text-align:center;
+   /*margin-right:1px;*/
+   position:relative;
+   /*float:left;*/
+   height:47px;
+}
+
+.programtext {
+   top:0;
+   height:49;
+   font-size:22px;
+   line-height:49px;
+   position: absolute;
+}
+
+#channelList {
+   height: 460px;
+   left: 81px;
+   overflow: hidden;
+   padding: 0;
+   position: absolute;
+   top: 163px;
+   width: 230px;
+   font-size:24px;
+   /*border:1px solid red;*/
+}
