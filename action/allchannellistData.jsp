@@ -100,7 +100,7 @@
                 ChannelInfoList.addAll(vChannelData);
         }
 //添加301屏蔽
-        //迷你页屏蔽(直播+点播) //备注
+        //迷你页屏蔽(直播+点播)
 		for (int m = 0; m < ChannelInfoList.size(); m++) {
             ChannelInfo ChannelInfom = (ChannelInfo) ChannelInfoList.get(m);
             String noas = String.valueOf(ChannelInfom.getMixNo());

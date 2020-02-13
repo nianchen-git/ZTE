@@ -46,14 +46,14 @@ function load_page() {
 
     obj_images_roll = new RollImages();
     var title_dom_ids = ["recommend_0", "recommend_1", "recommend_2", "recommend_3", "recommend_4", "recommend_5", "recommend_6", "recommend_7", "recommend_8"];
-    var recommend_title = ['新闻专区','金鼠春晚合集','嗨皮乐园','一首歌一座城专区','雷神山现场直播','冰冻营救','4K专区','乡村爱情11','扫码缴费'];
+    var recommend_title = ['新闻专区','金鼠春晚合集','嗨皮乐园','一首歌一座城专区','海量内容全家享','冰冻营救','4K专区','乡村爱情11','扫码缴费'];
     var recommend_focus_img = ['recommend_0.jpg', 'recommend_1.jpg', 'recommend_2.jpg', 'recommend_3.jpg', 'recommend_4.jpg', 'recommend_5.jpg', 'recommend_6.jpg', 'recommend_7.jpg', 'recommend_8.jpg'];
     var recommendzte_url = [
         'http://210.13.3.137/epg_index.php?UserID='+userid+'&channel_num='+now_channel_num+'&vender=zte&group=aishangkb&epgstbType='+stbTypezte+'&ReturnURL='+ returnurl+'&page=cntvColumn&cntvColumnName=News&epgRecommendCntv=1',//0.新闻专区
         "vod_portal_pre.jsp?columnid=2011&topicindex=08&columnname=淘娱乐&leefocus=8_",//金鼠春晚合集
 		portal_third_arr[0].curl,//2.嗨皮乐园
         'http://210.13.3.137/epg_index.php?UserID='+userid+'&channel_num='+now_channel_num+'&vender=zte&group=aishangkb&epgstbType='+stbTypezte+'&ReturnURL='+ returnurl+'&page=cntvColumn&cntvColumnName=onesong&epgRecommendCntv=1',//3.壮丽70年
-        "channel_play.jsp?mixno=358&leefocus=8_",//4.雷神山现场直播
+        'http://210.13.3.184/epg_index.php?UserID='+userid+'&channel_num='+now_channel_num+'&vender=zte&group=YEWUZU30&ReturnURL='+ returnurl+'&epgstbType='+stbType+'&page=special_topic&special_topic_id=7&recommend_flag=1',//4.海量内容全家享
         portal_third_arr[2].curl,//5.冰冻营救
         'http://210.13.3.137/epg_index.php?UserID='+userid+'&channel_num='+now_channel_num+'&vender=zte&group=aishangkb&epgstbType='+stbTypezte+'&ReturnURL='+ returnurl+'&page=cntvColumn&cntvColumnName=i4k&epgRecommendCntv=1',//6.4K专区
         "vod_series_list.jsp?strADid=&strADid2=true&columnid=201709&programid=0000000030140000844235&programtype=1&contentid=00000020140005742171&columnpath=看吧>电视剧VIP>时代传奇&programname=&leefocus=8_",//7.乡村爱情11
@@ -132,7 +132,7 @@ function load_page() {
         "vod_portal_pre.jsp?columnid=2011&topicindex=08&columnname=淘娱乐&leefocus=8_",//金鼠春晚合集
 		portal_third_arr[0].curl,//2.嗨皮乐园
         'http://210.13.3.137/epg_index.php?UserID='+userid+'&channel_num='+now_channel_num+'&vender=zte&group=aishangkb&epgstbType='+stbTypezte+'&ReturnURL='+ returnurl+'&page=cntvColumn&cntvColumnName=onesong&epgRecommendCntv=1',//3.壮丽70年
-        "channel_play.jsp?mixno=358&leefocus=8_",//4.雷神山现场直播
+        'http://210.13.3.184/epg_index.php?UserID='+userid+'&channel_num='+now_channel_num+'&vender=zte&group=YEWUZU30&ReturnURL='+ returnurl+'&epgstbType='+stbType+'&page=special_topic&special_topic_id=7&recommend_flag=1',//4.海量内容全家享
         portal_third_arr[2].curl,//5.冰冻营救
         'http://210.13.3.137/epg_index.php?UserID='+userid+'&channel_num='+now_channel_num+'&vender=zte&group=aishangkb&epgstbType='+stbTypezte+'&ReturnURL='+ returnurl+'&page=cntvColumn&cntvColumnName=i4k&epgRecommendCntv=1',//6.4K专区
         "vod_series_list.jsp?strADid=&strADid2=true&columnid=201709&programid=0000000030140000844235&programtype=1&contentid=00000020140005742171&columnpath=看吧>电视剧VIP>时代传奇&programname=&leefocus=8_",//7.乡村爱情11
