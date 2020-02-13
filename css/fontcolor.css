@@ -1,0 +1,41 @@
+/* five common style */
+.WhiteBigStyle{
+	color:#ffffff;
+	font-size:18px;
+}
+
+.WhiteSmallStyle{
+	color:#ffffff;
+	font-size:16px;
+}
+
+.BigStyle{
+	color:#ffffff;
+	font-size:22px;
+}
+
+.BigFontStyle{
+	color:#ffffff;
+	font-size:24px;
+}
+
+.BigBlueStyle{
+	color:#5c7587;
+	font-size:22px;
+}
+
+.BigBlueFontStyle{
+	color:#5c7587;
+	font-size:24px;
+} 
+
+.BlackFontStyle{
+	color:#000000;
+	font-size:18px;
+}
+
+td{
+	line-height: 32px;
+}
+/*  channel specially  style */
+

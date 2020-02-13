@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="GBK"?>
+
+<root>
+    <city>
+      <name>北京</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    + <city>
+      <name>海淀</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>朝阳</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>顺义</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>怀柔</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>29</temperature_h>
+      <temperature_l>19</temperature_l>
+      </city>
+    - <city>
+      <name>通州</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>21</temperature_l>
+      </city>
+    - <city>
+      <name>昌平</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>延庆</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>29</temperature_h>
+      <temperature_l>16</temperature_l>
+      </city>
+    - <city>
+      <name>丰台</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>石景山</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>大兴</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>30</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>房山</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>29</temperature_h>
+      <temperature_l>19</temperature_l>
+      </city>
+    - <city>
+      <name>密云</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>29</temperature_h>
+      <temperature_l>19</temperature_l>
+      </city>
+    - <city>
+      <name>门头沟</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>29</temperature_h>
+      <temperature_l>20</temperature_l>
+      </city>
+    - <city>
+      <name>平谷</name>
+      <time>2011-08-23</time>
+      <phenomena>多云</phenomena>
+      <wind>无持续风向</wind>
+      <windpower>微风</windpower>
+      <temperature_h>29</temperature_h>
+      <temperature_l>19</temperature_l>
+      </city>
+</root>

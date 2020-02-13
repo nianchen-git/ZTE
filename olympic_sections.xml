@@ -1,0 +1,7 @@
+<xml-section>
+    <page-section background="olympicimages/index.jpg" pixels="1280*720" name="olympic_index">
+        <section type="code" div="LinkImageDiv" name="LinkImageDiv14" left="23" top="183" height="62" width="290">
+            <code><![CDATA[<div style="position:absolute;left:23;top:183;width:290;height:62"><img id="LinkImageDiv14_img" src="" width="290" height="62"/></div><div id="LinkImageDiv14_div" style="position:absolute;left:23;top:183;width:290;height:62"><a name="LinkImageDiv14_link" href="vod_Playy.jsp?columnid=0002&programid=0000003020000012&seriesprogramcode=0000003020000012&programtype=0&leefocus=LinkImageDiv14_link" ><img src="images/btn_trans.gif" border="0" width="290" height="62"></a></div>]]></code>
+        </section>
+    </page-section>
+</xml-section>

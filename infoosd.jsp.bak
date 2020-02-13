@@ -1,0 +1,273 @@
+<%@ page import="com.zte.iptv.epg.util.STBKeysNew" %>
+<%@ page import="com.zte.iptv.epg.web.VoDQueryValueIn" %>
+<%@ page import="com.zte.iptv.newepg.datasource.VodOneDataSource" %>
+<%@ page import="com.zte.iptv.epg.util.EpgConstants" %>
+<%@ page import="com.zte.iptv.epg.account.UserInfo" %>
+<%@ page import="com.zte.iptv.newepg.datasource.EpgResult" %>
+<%@ page import="java.util.Vector" %>
+<%@ page import="com.zte.iptv.epg.content.VoDContentInfo" %>
+<%@ page import="com.zte.iptv.epg.util.CodeBook" %>
+<%@page contentType="text/html; charset=GBK" %>
+<%@taglib uri="/WEB-INF/epgtag.tld" prefix="epg" %>
+<epg:PageController/>
+<html>
+<head>
+    <script type="text/javascript">
+        function osdkeypress(evt) {
+            var keyCode = parseInt(evt.which);
+            if (keyCode == 0x0028) {
+
+ }
+            else if(keyCode == 265)// remoteFastRewind
+            {
+                return false;
+            }
+            else if(keyCode == 264)// remoteFastForworde
+            {
+                return false;
+            }
+            else if(keyCode == 263)// RmotePlayPause
+            {
+                return false;
+            }
+            else if(keyCode == 270)// remoteStop
+            {
+                return false;
+            }
+             else if (keyCode == 0x0026) {
+
+            } else if (keyCode == 0x0025) { //onKeyLeft
+
+            } else if (keyCode == 0x0027) { //onKeyRight
+
+            } else if (keyCode == 0x0008  || keyCode == 24 || keyCode == 0x010c ) {///back
+                hiddenOSD();
+            } else {
+                //                clearStack();
+//                top.onkeypress(evt);
+                top.doKeyPress(evt);
+                return true;
+            }
+            return false;
+        }
+
+    </script>
+</head>
+<%!
+    public String getPath(String uri) {
+        String path = "";
+        int begin = 0;
+        int end = uri.lastIndexOf('/');
+        if (end > 0) {
+            path = uri.substring(begin, end + 1) + path;
+        }
+        return path;
+    }
+%>
+<epg:script/>
+<script type="text/javascript">
+    function showDescripton(description) {
+        var des = description;
+        if (des.length > 85) {
+            des = des.substr(0, 85) + "...";
+        }
+        document.write("<font  style=' word-break:break-all; ' >" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + des + "</font>");
+    }
+    function getLength(contentlength)
+    {
+        var hours = contentlength.split(':');
+        var minutes = 0;
+        if (hours[0] > 0) {
+            minutes = hours[0] * 60;
+        }
+        var showMinutes = parseInt(minutes) + parseInt(hours[1])
+        document.write(showMinutes + "分钟");
+    }
+
+
+</script>
+<%
+    String columnid=request.getParameter("columnid");
+    String programid=request.getParameter("programid");
+    String programtype=request.getParameter("programtype");
+
+    UserInfo userInfo = (UserInfo) session.getAttribute(EpgConstants.USERINFO);
+    VodOneDataSource ds=new VodOneDataSource();
+    VoDQueryValueIn valueIn=(VoDQueryValueIn)ds.getValueIn();
+    valueIn.setColumnId(columnid);
+    valueIn.setProgramId(programid);
+    valueIn.setUserInfo(userInfo);
+
+    //!=1就是连续剧了
+    if(programtype!=null && !programtype.equals("") && !programtype.equals("1")){
+        System.out.println("SSSSSSSSSSSSSSSSSSSS1111");
+        valueIn.setVoDType(CodeBook.VOD_TYPE_SERIES_Head);
+    }
+
+    EpgResult result=ds.getData();
+    Vector vector=(Vector)result.getData();
+    VoDContentInfo vodInfo = null;
+    String actor = "";
+    String director = "";
+     String programName = "";
+    String description = "";
+//System.out.println("==aaaaaaaaaaaa==");
+    if(vector!=null && vector.size()>0){
+	//alert("aaaaaaaaaaaaaaaaaaa");
+        vodInfo = (VoDContentInfo)vector.get(0);
+        actor = vodInfo.getActor();
+        director = vodInfo.getDirector();
+        programName = vodInfo.getProgramName();
+        description = vodInfo.getDescription();
+		//alert("description="+description);
+		System.out.println("==description=="+description);
+    }
+	
+
+       if(programName.length()>49){
+        programName = programName.substring(0,49)+"...";
+    }
+    if(actor.length()>24){
+        actor = actor.substring(0,24)+"...";
+    }
+    if(director.length()>11){
+        director = director.substring(0,11)+"...";
+    }
+
+    if(description.length()>85){
+        description = description.substring(0,85)+"...";
+    }
+
+%>
+
+<body bgcolor="transparent">
+<%--info背景图片--%>
+<div id="pasuse_ad" style="left:0; top:574;width:1280px;height:146px; position:absolute">
+    <img src="images/vod/btv-02-bottombg.png" width="1280px" height="146px" border="0" alt=""/>
+</div>
+<!--片名-->
+
+
+<div id="pasuse_ad"
+     style="left:88px; top:578px;width:61px;height:30; position:absolute;font-weight:bold;font-size:22px;color:#CC0000;">
+    片名:
+</div>
+<%--<epg:div left="153" top="575" width="480" height="34" type="text" field="ProgramName" datasource="VodOneDecorator">--%>
+<%--    <epg:formatter size="5" color="#CC0000" pattern="50." bolded="true"/>--%>
+<div style=" left:153px; top:575px;width:980px;height:34; position:absolute;font-weight:bold;font-size:22px;color:#CC0000;">
+    <%=programName%>
+</div>
+<%--</epg:div>--%>
+<%
+    if(!director.equals("")){
+%>
+<!--导演-->
+<div style="position:absolute; width:63px; height:22px; left: 88; top: 604px; color:#FFFFFF;font-size:22px;">
+    导演:
+</div>
+<%--<epg:div left="153" top="604" width="380" height="36" field="Director" datasource="VodOneDecorator">--%>
+  <%--  <epg:formatter size="5" color="#FFFFFF" pattern="20.0"/>--%>
+<%--</epg:div>--%>
+<div style=" left:153px; top:604px;width:300px;height:36; position:absolute;font-weight:bold;font-size:22px;color:#FFFFFF;">
+    <%=director%>
+</div>
+<%
+    }
+
+    if(!actor.equals("")){
+%>
+<!--主演-->
+<div style="position:absolute; width:54px; height:22px; left: 488px; top: 604px; font-size:22px;color:#FFFFFF;">
+    主演:
+</div>
+<%--<epg:div left="548" top="604" width="550" height="36" field="Actor" datasource="VodOneDecorator">--%>
+  <%--  <epg:formatter size="5" color="#FFFFFF" pattern="20.0"/>--%>
+<div style=" left:548px; top:604px;width:550px;height:36; position:absolute;font-weight:bold;font-size:22px;color:#FFFFFF;">
+    <%=actor%>
+</div>
+<%--</epg:div>--%>
+
+<%
+    }
+%>
+
+<!--时长-->
+<div style="position:absolute; width:70px; height:36px; left: 1100; top: 608;color:#FFFFFF;font-size:22px ;">
+    时长:
+</div>
+
+<div id="endTime"
+     style="position:absolute; width:120px; height:36px; left: 1160; top: 608;color:#FFFFFF;font-size:22px ;">
+
+</div>
+<!--介绍-->
+<div style="position:absolute; width:63px; height:28px; left: 88px; top: 636px; font-size:22px;color:#FFFFFF">
+    介绍:
+</div>
+<%--<epg:div left="88" top="636" width="1150" height="60" type="script" data="showDescripton('{Description}');"
+         datasource="VodOneDecorator">--%>
+  <%--  <epg:formatter bolded="false" size="5" color="#FFFFFF" pattern="20."/>--%>
+  <%--</epg:div>--%>
+<div style="left:138px;  top:636px;width:1050px;height:60; position:absolute;font-weight:bold;font-size:22px;color:#FFFFFF;">
+    <%=description%>
+</div>
+<div style="left:1100; top:580;width:80;height:27; position:absolute;font-size:22px;color:#FFFFFF"
+     id="currentTimeDiv"></div>
+
+<script type="text/javascript">
+var VODTotalHours=0;
+var VODTotalMinutes =0;
+    function getTimeLength() {
+        var duration = top.jsDoGetVODTimeInfo();
+        var VODTimeInfo = parseInt(duration);
+        var VODTotalMinutes = VODTimeInfo / 60;  
+		if(VODTimeInfo==0||VODTimeInfo==""||VODTimeInfo==null){
+			setTimeout(getTimeLength(),0.2);
+			return;
+		}
+		VODTotalMinutes = parseInt(VODTotalMinutes);
+        if (VODTotalMinutes < 1) {
+            VODTotalMinutes = 1;
+        }
+        VODTotalMinutes = VODTotalMinutes;
+        top.mainWin.document.all.endTime.innerHTML = VODTotalMinutes + "分钟";
+    }
+    function refreshCurrentTime() {
+        var currentTime = top.jsGetCurrentPlayTime();
+		System.out.println("==currentTime=="+currentTime);
+        var VODTimeInfo = parseInt(currentTime,10);
+         VODTotalHours = VODTimeInfo / 3600 ;
+		 System.out.println("==VODTotalHours 111=="+VODTotalHours);
+        VODTotalHours = parseInt(VODTotalHours,10);
+		System.out.println("==VODTotalHours 222=="+VODTotalHours);
+        if (("" + VODTotalHours).length == 1)
+        {
+            VODTotalHours = "0" + VODTotalHours;
+        }
+		System.out.println("==VODTotalHours 333=="+VODTotalHours);
+        var StrVODTotalHours = VODTotalHours;
+		System.out.println("==StrVODTotalHours 222=="+StrVODTotalHours);
+        VODTotalHours = parseInt(VODTotalHours, 10);
+         VODTotalMinutes = (VODTimeInfo - VODTotalHours * 3600) / 60;
+        VODTotalMinutes = parseInt(VODTotalMinutes);
+        if (("" + VODTotalMinutes).length == 1)
+        {
+            VODTotalMinutes = "0" + VODTotalMinutes;
+        }
+      top.mainWin.document.all.currentTimeDiv.innerHTML = StrVODTotalHours + ":" + VODTotalMinutes + "";
+    }
+	
+	
+    function hiddenOSD() {
+        top.jsHideOSD();
+    }
+    getTimeLength();
+   // refreshCurrentTime();
+    setTimeout(hiddenOSD, 6000);
+    <%--top.jsSetupKeyFunction("top.mainWin.hiddenOSD", <%=STBKeysNew.remoteBack%>);    --%>
+    document.onkeypress = osdkeypress;
+
+
+</script>
+</body>
+</html>

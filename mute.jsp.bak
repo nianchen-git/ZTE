@@ -1,0 +1,104 @@
+<%@page contentType="text/html; charset=GBK" %>
+<%@taglib uri="/WEB-INF/epgtag.tld" prefix="epg"%>
+
+<html>
+<body bgcolor = "transparent" onload = "pageInit()">
+<div style="left:0;top:491;position:absolute">
+    <img src="images/sounds/soundBg.png" alt="" width="1280" height="194"/>
+</div>
+<%--<div style="left:59; top:545;width:71;height:92; position:absolute" id="volumeBack">--%>
+    <%--<img width="71" height="92" src="images/sounds/soundIcon.png" alt=""/>--%>
+<%--</div>--%>
+<%--<%--%>
+    <%--for (int i = 1; i <= 20; i++) {--%>
+        <%--int left = 120 + i * 40;--%>
+<%--%>--%>
+<%--<div style="left:<%=left%>; top:561;width:25;height:53; position:absolute; ">--%>
+    <%--<img src="images/sounds/soundBlack.png"--%>
+         <%--alt=""/></div>--%>
+<%--<%}%>--%>
+
+</body>
+<script language="javascript">
+
+function pageDisableWithTimer()
+{
+	  top.jsClearKeyFunction();
+		top.jsHideOSD();
+}
+
+function pageVolumeOnKeyPressed()
+{
+	  pageDisableWithTimer();
+}
+
+function vitur()
+{
+	top.virtualEvent();
+}
+
+function pageInit()
+{
+	top.jsSetupKeyFunction("top.mainWin.pageMute", 0x0105);
+	top.jsSetupKeyFunction("top.mainWin.pageVolumePlus", 0x0103);
+  top.jsSetupKeyFunction("top.mainWin.pageVolumeMinus", 0x0104);
+  top.jsSetupKeyFunction("top.mainWin.pageVolumeOnKeyPressed", "onKeyPressed");
+  top.jsSetupKeyFunction("top.mainWin.vitur", 0x0300);
+}
+
+function pageVolumePlus()
+{
+	top.jsHideOSD();
+  top.remoteVolumePlus();
+}
+
+function pageVolumeMinus()
+{
+  //var muteFlag = top.mp.getMuteFlag();
+  var muteFlag = top.doGetMuteState();
+  //var volume = top.mp.getVolume();
+  var volume = top.jsGetVolume();
+  if(muteFlag == 1 && volume == 0)
+  {
+  	return;
+  }
+  top.jsHideOSD();
+  top.remoteVolumeMinus();
+}
+
+function pageMute()
+{
+  //var muteFlag = top.mp.getMuteFlag();
+  var muteFlag = top.doGetMuteState();
+  if(muteFlag == 1)
+  {
+  	   //var vol = parseInt(top.mp.getVolume());
+  	   var vol = top.jsGetVolume();
+  	   if(vol == 0)
+  	   {
+  	   	  top.jsHideOSD();
+  	   }
+  	   else
+  	   {
+       //top.mp.setMuteFlag(0);
+       top.doSetMuteState(0);
+       top.jsHideOSD();
+       top.showVolumeOSD();
+      }
+  }
+  else if(muteFlag == 0)
+  {
+       top.jsHideOSD();
+  }
+}
+document.onkeypress = top.doKeyPress;
+
+function pageDisableWithTimer() {
+    top.jsClearKeyFunction();
+    top.jsHideOSD();
+}
+
+disableWithTimer = setTimeout("pageDisableWithTimer();", 3000);
+focus();
+</script>
+</html>

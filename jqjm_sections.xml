@@ -1,0 +1,28 @@
+<xml-section>
+	<page-section background="images/special/jqjm.jpg" pixels="1280*720" name="jqjm_index">
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv14" left="63" top="215" height="50" width="325">
+			<code><![CDATA[<div style="position:absolute;left:63;top:215;width:325;height:50"><img id="LinkImageDiv14_img" src="" width="325" height="50"/></div><div id="LinkImageDiv14_div" style="position:absolute;left:63;top:215;width:325;height:50"><a name="LinkImageDiv14_link" href="vod_Playy.jsp?columnid=0002&programid=20000064926&seriesprogramcode=20000064926&programtype=0&leefocus=LinkImageDiv14_link" ><img src="images/btn_trans.gif" border="0" width="325" height="50"></a></div>]]></code>
+		</section>
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv15" left="63" top="265" height="50" width="325">
+			<code><![CDATA[<div style="position:absolute;left:63;top:265;width:325;height:50"><img id="LinkImageDiv15_img" src="" width="325" height="50"/></div><div id="LinkImageDiv15_div" style="position:absolute;left:63;top:265;width:325;height:50"><a name="LinkImageDiv15_link" href="vod_Playy.jsp?columnid=0002&programid=0000020000066431&seriesprogramcode=0000020000066431&programtype=0&leefocus=LinkImageDiv15_link" ><img src="images/btn_trans.gif" border="0" width="325" height="50"></a></div>]]></code>
+		</section>
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv16" left="63" top="315" height="50" width="325">
+			<code><![CDATA[<div style="position:absolute;left:63;top:315;width:325;height:50"><img id="LinkImageDiv16_img" src="" width="325" height="50"/></div><div id="LinkImageDiv16_div" style="position:absolute;left:63;top:315;width:325;height:50"><a name="LinkImageDiv16_link" href="vod_Playy.jsp?columnid=0004&programid=20000066432&seriesprogramcode=20000066432&programtype=0&leefocus=LinkImageDiv16_link" ><img src="images/btn_trans.gif" border="0" width="325" height="50"></a></div>]]></code>
+		</section>
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv17" left="63" top="365" height="50" width="325">
+			<code><![CDATA[<div style="position:absolute;left:63;top:365;width:325;height:50"><img id="LinkImageDiv17_img" src="" width="325" height="50"/></div><div id="LinkImageDiv17_div" style="position:absolute;left:63;top:365;width:325;height:50"><a name="LinkImageDiv17_link" href="vod_Playy.jsp?columnid=0003&programid=20000066432&seriesprogramcode=20000066432&programtype=0&leefocus=LinkImageDiv17_link" ><img src="images/btn_trans.gif" border="0" width="325" height="50"></a></div>]]></code>
+		</section>
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv19" left="830" top="175" height="42" width="375">
+			<code><![CDATA[<div style="position:absolute;left:830;top:175;width:375;height:42"><img id="LinkImageDiv19_img" src="" width="375" height="42"/></div><div id="LinkImageDiv19_div" style="position:absolute;left:830;top:175;width:375;height:42"><a name="LinkImageDiv19_link" href="vod_Playy.jsp?columnid=0001&programid=20000066432&seriesprogramcode=20000066432&programtype=0&leefocus=LinkImageDiv19_link" ><img src="images/btn_trans.gif" border="0"  width="375" height="42"></a></div>]]></code>
+		</section>
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv20" left="830" top="216" height="42" width="375">
+			<code><![CDATA[<div style="position:absolute;left:830;top:216;width:375;height:42"><img id="LinkImageDiv20_img" src="" width="375" height="42"/></div><div id="LinkImageDiv20_div" style="position:absolute;left:830;top:216;width:375;height:42"><a name="LinkImageDiv20_link" href="vod_Playy.jsp?columnid=0004&programid=0000020000066431&seriesprogramcode=0000020000066431&programtype=0&leefocus=LinkImageDiv20_link" ><img src="images/btn_trans.gif" border="0" width="375" height="42"></a></div>]]></code>
+		</section>
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv21" left="830" top="256" height="42" width="375">
+			<code><![CDATA[<div style="position:absolute;left:830;top:256;width:375;height:42"><img id="LinkImageDiv21_img" src="" width="375" height="42"/></div><div id="LinkImageDiv21_div" style="position:absolute;left:830;top:256;width:375;height:42"><a name="LinkImageDiv21_link" href="vod_Playy.jsp?columnid=0002&programid=0000003020000012&seriesprogramcode=0000003020000012&programtype=0&leefocus=LinkImageDiv21_link" ><img src="images/btn_trans.gif" border="0" width="375" height="42"></a></div>]]></code>
+		</section>
+		<section type="code" div="LinkImageDiv" name="LinkImageDiv22" left="800" top="370" height="120" width="430">
+			<code><![CDATA[<div style="position:absolute;left:800;top:370;width:430;height:120"><img id="LinkImageDiv22_img" src="" width="430" height="120"/></div><div id="LinkImageDiv22_div" style="position:absolute;left:800;top:370;width:430;height:120"><a name="LinkImageDiv22_link" href="vod_Playy.jsp?columnid=0002&programid=0000003020000012&seriesprogramcode=0000003020000012&programtype=0&leefocus=LinkImageDiv22_link" ><img src="images/btn_trans.gif" border="0" width="430" height="120"></a></div>]]></code>
+		</section>
+	</page-section>
+</xml-section>

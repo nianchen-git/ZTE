@@ -1,0 +1,224 @@
+<%@page contentType="text/html; charset=GBK" %>
+<%@page isELIgnored="false"%> 
+<%@taglib uri="/WEB-INF/extendtag.tld" prefix="ex"%> 
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="/WEB-INF/epgtag.tld" prefix="epg" %>
+<%@page import="com.zte.iptv.epg.account.UserInfo" %>
+<%@ page import="com.zte.iptv.newepg.tag.PageController" %>
+<%@ page import="com.zte.iptv.epg.util.*" %>
+<%@ page import="com.zte.iptv.epg.utils.Utils" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="com.zte.iptv.epg.util.EpgConstants" %>
+<%@ page import="java.text.DateFormat" %>
+<%@page import="com.zte.iptv.epg.util.PortalUtils" %>
+<%@ page import="java.util.*" %>
+<%@ include file="inc/words.jsp" %>
+<%@ include file="inc/ad_utils.jsp" %>
+<%@ include file="inc/getFitString.jsp" %>
+<meta http-equiv="pragma"   content="no-cache" />  
+<meta http-equiv="Cache-Control" content="no-cache" />  
+<meta http-equiv="expires" content="0" />
+<epg:PageController name="selfcare_record_ppv.jsp"/>
+<%!
+    public String getDetailPrice(String price) {
+        String temp = price + "";
+        int index = temp.indexOf(".");
+        if (index < 0) {
+            temp += ".00";
+        } else if (index == temp.length() - 1) {
+            temp += "00";
+        } else if (index == 0) {
+            temp = "0" + temp;
+        } else if (index == temp.length() - 2) {
+            temp += "0";
+        } else if (index < temp.length() - 2) {
+            temp = temp.substring(0, index + 3);
+        }
+        return temp;
+    }
+	
+	 public  String format(String price,String rate){
+
+		double priceInt = Double.valueOf(price);
+		double rateInt = Double.valueOf(rate);
+		double pricedb = (double) (priceInt/rateInt);
+		String priceStr =  String.valueOf(pricedb);
+		if(priceStr.endsWith(".0")){
+			priceStr = priceStr.substring(0,priceStr.length()-2);
+		}
+
+		return priceStr;
+	}
+
+%>
+<%
+ String path = PortalUtils.getPath(request.getRequestURI(), request.getContextPath());
+ HashMap param = PortalUtils.getParams(path, "GBK");
+ String columnCode = String.valueOf(param.get("Fathercolumnlist"));
+ long totalcount = 0;
+List <String> contentCode = new ArrayList<String>();
+List <String> contentName = new ArrayList<String>();
+List <String> feecost = new ArrayList<String>();
+List <String> productName = new ArrayList<String>();
+List <String> begintime = new ArrayList<String>();
+List <String> endtime = new ArrayList<String>();
+List <String> productid = new ArrayList<String>();
+
+ UserInfo userInfo = (UserInfo) session.getAttribute(EpgConstants.USERINFO);
+ String userId = userInfo.getUserId();//获取用户账号
+%>
+
+
+
+
+<html>   
+<head>
+    <title>order list</title>
+<style>
+.font_28{
+
+        color:#ffffff;
+        
+        font-size:28px;
+}
+.font_26{
+
+        color:#ffffff;
+        
+        font-size:26px;
+}
+.font_24{
+
+        color:#ffffff;
+        
+        font-size:24px;
+}
+.font_32{
+		color:#ffffff;
+        
+        font-size:32px;
+}
+.font_36{
+		color:#ffffff;
+        
+        font-size:36px;
+}
+</style>
+
+</head>
+<body bgcolor="transparent">
+<div  style="position:absolute; width:1280px; height:720px; left:0px; top:0px;"><img src="images/myrecord/order_bg.png" height="720" width="1280" alt=""></div>
+
+<!--顶部信息-->
+<div style="position:absolute; width:53; height:36; left:55px; top:16px;">
+    <img src="images/search/icon_5.png" border="0"></div>
+
+<div id="path" style="position:absolute; width:760px; height:30px; left:110px; top:25px;font-size:24px;color:#FFFFFF">
+    应用 > 我的订购
+</div>
+<div id="userID" style="position: absolute; width: 392px; height: 30px; left: 875px; top: 25px" class="font_24"></div>
+<div style="position:absolute; width:230px; height:383px; left:91px; top:100px;"><img src="images/myrecord/ppv_left.png" width="230" height="383"></div>
+<div style="position:absolute; width:200px; height:40px; left:105px; top:119px; font-size:24px; color:#FFFFFF" align="center">已订购产品</div>
+
+<div  style="position:absolute; width:203px; height:52px; left:104px; top:174px;"><img id="select_order_product_0" src="images/btn_trans.gif" width="203" height="52"></div>
+<div id ="package_name_0" style="position:absolute; width:204px; height:52px; left:104px; top:184px;" align="center" class="font_26"></div>
+
+<div  style="position:absolute; width:203px; height:52px; left:104px; top:230px;"><img id="select_order_product_1" src="images/btn_trans.gif" width="203" height="52"></div>
+<div id ="package_name_1" style="position:absolute; width:204px; height:52px; left:104px; top:240px;" align="center" class="font_26"></div>
+
+<div  style="position:absolute; width:203px; height:52px; left:104px; top:285px;"><img id="select_order_product_2" src="images/btn_trans.gif" width="203" height="52"></div>
+<div id ="package_name_2" style="position:absolute; width:204px; height:52px; left:104px; top:295px;" align="center" class="font_26"></div>
+
+<div  style="position:absolute; width:203px; height:52px; left:104px; top:341px;"><img id="select_order_product_3" src="images/btn_trans.gif" width="203" height="52"></div>
+<div id ="package_name_3" style="position:absolute; width:204px; height:52px; left:104px; top:351px;" align="center" class="font_26"></div>
+
+<div  style="position:absolute; width:203px; height:52px; left:104px; top:397px;"><img id="select_order_product_4" src="images/btn_trans.gif" width="203" height="52"></div>
+<div id ="package_name_4" style="position:absolute; width:204px; height:52px; left:104px; top:407px;" align="center" class="font_26"></div>
+
+<!--上下按钮-->
+<div id="button_up" style="position:absolute; width:25px; height:14px; left:181px; top:159px; visibility:visible"><img src="images/vod/btv_up.png" width="25" height="14"></div>
+<div id="button_down" style="position:absolute; width:25px; height:14px; left:181px; top:460px; visibility:visible"><img src="images/vod/btv_down.png" width="25" height="14"></div>
+<!--<div id="info" style="position:absolute; width:911px; height:76px; left:320px; top:107px" class="font_24"></div>-->
+<div id="product_a" style="position:absolute; width:1280px; height:720px; left:0px; top:0px; display:block">
+<div id="product_name" style="position:absolute; width:911px; height:30px; left:350px; top:118px" class="font_24"></div>
+<div id="product_leixing" style="position:absolute; width:911px; height:30px; left:350px; top:157px" class="font_24">产品类型：包月</div>
+
+<div id="product_price" style="position:absolute; width:700px; height:30px; left:349px; top:196px" class="font_24">产品价格：</div>
+<div id="product_price1" style="position: absolute; width: 200px; height: 30px; left: 466px; top: 196px" class="font_24"></div>
+<div id="current_price" style="position: absolute; width: 600px; height: 30px; left: 593px; top: 196px; visibility: hidden" class="font_24"></div>
+
+<div id="product_ordertime" style="position:absolute; width:911px; height:30px; left:349px; top:235px" class="font_24"></div>
+<div id="product_indecation" style="position:absolute; width:911px; height:30px; left:350px; top:283px" class="font_24">产品说明：本产品为包月产品，产品内所有内容在有效期内可无限次收看。订购发生在当月16日零时以后的，该月资费半价。若无退订操作，本产品次月将自动续订。退订操作完成后，当月还可继续使用该包月产品，次月退订生效。</div>
+<div id="product_remark" style="position:absolute; width:911px; height:30px; left:350px; top:380px" class="font_24"></div>
+</div>
+
+
+<div id="product_info" style="position:absolute; width:911px; height:30px; left:350px; top:380px" class="font_24"></div>
+</div>
+
+<div id="unsubscribe" style="position:absolute; width:139px; height:52px; left:683px; top:466px; visibility:visible"><img src="images/myrecord/return.png" width="139"></div>
+<div id="unsubscribe_focus" style="position:absolute; width:139px; height:52px; left:683px; top:466px; visibility:hidden"><img src="images/myrecord/price_onfocus.png" width="139"></div>
+
+
+
+
+
+
+<!--退订-->
+<div id="dialog_subscribe" style="position:absolute; width:609px; height:205px; left:345px; top:221px; visibility:hidden">
+<div  style="position:absolute; width:609px; height:250px; left:0px; top:0px; "><img id="dialog_pic" src="" width="609" height="250"></div>
+<div id="dialog_subscribe_button" style="position:absolute; width:158px; height:44px; left:76px; top:186px; visibility:hidden"><img src="images/order/price_onfocus.png" width="158" height="44"></div>
+
+<div id="dialog_remove_button" style="position:absolute; width:158px; height:44px; left:372px; top:186px; visibility:hidden"><img src="images/order/price_onfocus.png" width="158" height="44"></div>
+</div>
+
+<!--单点不能退订提示-->
+<div id="dialog_unsubscribe" style="position:absolute; width:609px; height:205px; left:345px; top:221px; visibility:hidden">
+<div  style="position:absolute; width:609px; height:250px; left:0px; top:0px; "><img src="images/myrecord/dialog.png" width="609" height="250"></div>
+<div id="unsubscribe_info" style="position:absolute; width:560px; height:44px; left:22px; top:93px;" class="font_28">该产品包为单点包，有效期至2013年12月11日，到期自动退订！</div>
+</div>
+
+<!--退订成功-->
+<div id="dialog_subscribe_success" style="position:absolute; width:609px; height:250px; left:344px; top:223px; visibility:hidden;">
+<div style="position:absolute; width:609px; height:250px; left:0px; top:0px;"><img src="images/myrecord/Unsubscribe_ok.png" width="609" height="250"></div>
+</div>
+<!--退订失败-->
+<div id="dialog_subscribe_failed" style="position:absolute; width:609px; height:250px; left:344px; top:223px; visibility:hidden;">
+<div style="position:absolute; width:609px; height:250px; left:0px; top:0px;"><img src="images/myrecord/dialog.png" width="609" height="250"></div>
+<div id="dialog_subscribe_failed_remark" style="position:absolute; width:500px; height:54px; left:63px; top:96px;" align="center" class="font_26"></div>
+</div>
+<!--请求数据超时提示-->
+<div id="timeout_msg" style="position:absolute; width:553px; height:237px; left:344px; top:223px; visibility:hidden;"><img src="images/order/timeout_msg.png"   width="553" height="237"></div>
+
+<script type="text/javascript" src="js/contentloader.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript">
+ var _window = window;
+ if(window.opener){
+           _window = window.opener;
+ }
+ var userID = "<%=userId%>";
+ var length ;
+/* var product=['feecosta','productNamea','begintimea','endtimea','productida'];
+    product['feecosta']=[];
+    product['productNamea']=[];
+	product['begintimea']=[];
+    product['endtimea']=[];
+	product['productida']=[];*/
+	
+var istart = 0;
+var iend=5;
+var focus_index = 0;//产品内容索引id\
+var pageSeq = 0;
+var pageCount;
+var month_orderLsit=[];
+
+
+	
+</script>
+<script type="text/javascript" src="js/selfcare_record_ppv.js"></script>
+
+<%@include file="inc/goback.jsp" %>
+<%@include file="inc/lastfocus.jsp" %>
+</body>
+</html>
