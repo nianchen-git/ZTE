@@ -1,0 +1,35 @@
+<%@ page import="com.zte.iptv.epg.account.UserInfo" %>
+<%@ page import="com.zte.iptv.epg.util.EpgConstants" %>
+<%@ page contentType="text/html; charset=GBK" %>
+<%@ taglib uri="/WEB-INF/epgtag.tld" prefix="epg" %>
+<epg:PageController/>
+<%
+    UserInfo timeUserInfo = (UserInfo) request.getSession().getAttribute(EpgConstants.USERINFO);
+    String timePath1 = request.getContextPath();
+    String timeBasePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + timePath1 + "/";
+
+    String timeFrameUrl = timeBasePath + "function/index.jsp";
+%>
+<html>
+<head>
+<script language="javascript" type="">
+      // alert("====================================enter===backtop");
+		var frameid=top.jsGetControl("UserModel");
+        var timer=-1;
+		top.setDefaulchannelNo();
+		var lastChannelNum = top.channelInfo.lastChannel;
+     //   alert("=======================top.jsGetControl('backurlparam')============="+top.jsGetControl("backurlparam"));
+        var backparam = top.jsGetControl("backurlparam");
+        if (backparam.indexOf("community.jsp") > -1 || backparam.indexOf("application.jsp") > -1 || backparam.indexOf("favorite_service.jsp") > -1 || backparam.indexOf("life.jsp") > -1|| backparam.indexOf("portal.jsp") > -1) {
+            top.vodBackTimer = top.setTimeout("top.mainWin.document.location="+"'"+top.jsGetControl('backurlparam')+"';top.showOSD(2, 0, 25);top.setBwAlpha(0);",1000);
+             Authentication.CTCSetConfig('EPGDomain', "<%=timeFrameUrl%>");
+            // alert("=======================top.jsGetControl('backurlparam')========11111====="+top.jsGetControl("backurlparam"));
+        }
+        top.jsSetControl("isFromChannel","1");
+		top.jsRedirectChannel(lastChannelNum);
+</script>
+<title>third back page</title>                                    `
+</head>
+<body  bgcolor="transparent">
+</body>
+</html>

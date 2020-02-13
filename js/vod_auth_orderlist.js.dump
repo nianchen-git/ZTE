@@ -1,0 +1,505 @@
+
+var left_focus_index=0;
+var left_focus_length=length;
+var left_focus_flag=1;
+var playUrl="";
+custom_load_page();
+function custom_load_page(){
+
+show_product_list();
+show_product_recommend(0);
+init_focus();
+document.getElementById("product_program_name").innerHTML = programname;
+page_up_down();
+}
+function $(id) {
+    if (!$$[id]) {
+        $$[id]=document.getElementById(id);
+    }
+    return $$[id];
+}
+
+
+window.parent.document.onkeypress = cateKeyPressa;
+
+function commonKeyPress(evt) {
+    var keycode = evt.which;
+    if (keycode == 0x0101) { //????????
+        _window.top.remoteChannelPlus();
+    } else if (keycode == 0x0102) {
+        _window.top.remoteChannelMinus();
+    } else if (keycode == 0x0110) {
+        Authentication.CTCSetConfig("KeyValue", "0x110");
+        _window.top.mainWin.document.location = "portal.jsp";
+    } else if (keycode == 36) {
+        _window.top.mainWin.document.location = "portal.jsp";
+    } else if (keycode == 0x0008 || keycode == 24) {
+		//alert("111111111back");
+      // _window.top.mainWin.document.location = "back.jsp";
+	    document.getElementById("big_bg").style.display="none";
+		window.parent.document.getElementById("detail_bg").style.display = "block";
+		window.parent.document.getElementById("detail").style.visibility = "visible";
+		
+		if(window.parent.document.getElementById("playimg")!=null){
+			window.parent.document.getElementById("playimg").style.visibility = "visible";	
+		}
+		
+		
+        window.parent.document.getElementById("fdiv").style.width = "1px";
+        window.parent.document.getElementById("fdiv").style.height = "1px";
+        window.parent.document.getElementById("hiddenFrame").style.width="1px";
+        window.parent.document.getElementById("hiddenFrame").style.height="1px";
+	    window.parent.document.onkeypress = window.parent.mykeypres;
+    } else {
+        _window.top.doKeyPress(evt);
+    }
+}
+
+function cateKeyPressa(evt) {
+    var keyCode = parseInt(evt.which);
+   // alert("keycode======"+keyCode);
+    if (keyCode == 0x0028) { //onKeyDown
+	 
+        cateKeyDown();
+    } else if (keyCode == 0x0026) {//onKeyUp
+	
+        cateKeyUp();
+    } else if (keyCode == 0x0025) { //onKeyLeft
+	
+        cateKeyLeft();
+    } else if (keyCode == 0x0027) { //onKeyRight
+	
+        cateKeyRight();
+    } else if (keyCode == 0x000D) {  //OK
+	
+        cateKeyOK();
+    } else if (keyCode == 0x0008 || keyCode == 24 || keyCode==8 ) {
+		//alert("111111111back");
+      // _window.top.mainWin.document.location = "back.jsp";
+	    document.getElementById("big_bg").style.display="none";
+		window.parent.document.getElementById("detail_bg").style.display = "block";
+		window.parent.document.getElementById("detail").style.visibility = "visible";
+		
+		if(window.parent.document.getElementById("playimg")!=null){
+			window.parent.document.getElementById("playimg").style.visibility = "visible";	
+		}
+		
+        window.parent.document.getElementById("fdiv").style.width = "1px";
+        window.parent.document.getElementById("fdiv").style.height = "1px";
+        window.parent.document.getElementById("hiddenFrame").style.width="1px";
+        window.parent.document.getElementById("hiddenFrame").style.height="1px";
+		//window.parent.document.getElementById("detail").style.visibility="visible";
+	    window.parent.document.onkeypress = window.parent.mykeypres;
+    }else {
+		//clearBackParam();
+        _window.top.mainWin.commonKeyPress(evt);
+	
+        return true;
+    }
+    return false;
+}
+// function doKeyPress(evt) {
+//     var keycode = evt.which;
+//// alert("keycode:"+keycode);
+// //	//g_o.debug.print_log("*******keycode:"+keycode);
+//     if (keycode == 119) {//左
+//         cateKeyLeft();
+//     } else if (keycode == 115) {//右
+//         cateKeyRight();
+//    } else if (keycode == 0) {//确认
+//         cateKeyOK();
+//     } else if (keycode == 113) {//上
+//         cateKeyUp();
+//     } else if (keycode == 97) {//下
+//          cateKeyDown();
+//     } else {
+//       //  commonKeyPress(evt);
+//     }
+//     return false;
+// }
+//function doKeyPress(evt) {
+//    var keycode = evt.which;
+//	//g_o.debug.print_log("keycode:"+keycode);
+//    if (keycode == 37) {
+//        cateKeyLeft();
+//    } else if (keycode == 39) {
+//        cateKeyRight();
+//    } else if (keycode == 13) {
+//        cateKeyOK();
+//    } else if (keycode == 38) {
+//        cateKeyUp();
+//    } else if (keycode == 40) {
+//         cateKeyDown();
+//    } else {
+//        commonKeyPress(evt);
+//    }
+//    return false;
+//}
+
+function doKeyPress(evt) {
+    var keycode = evt.which;
+	//g_o.debug.print_log("keycode:"+keycode);
+    if (keycode == 0x0025) {
+        cateKeyLeft();
+    } else if (keycode == 0x0027) {
+        cateKeyRight();
+    } else if (keycode == 0x000D) {
+        cateKeyOK();
+    } else if (keycode == 0x0026) {
+        cateKeyUp();
+    } else if (keycode == 0x0028) {
+         cateKeyDown();
+    } else {
+        commonKeyPress(evt);
+    }
+    return false;
+}
+
+function show_product_list(){
+  
+    for(var i=0; i<5; i++){
+	var m = istart+i;
+    if(m<iend){
+	document.getElementById("order_product_name_"+i).innerHTML = writeFitString(product['strProductNamea'][m], 18, 120);
+	}else{
+	document.getElementById("order_product_name_"+i).innerHTML = "";
+	}
+   }
+   //document.getElementById("product_program_name").innerHTML = length;
+}
+
+function show_product_recommend(focusindex){
+	var unite_a ="";
+	if(product['strRentalUnita'][focusindex]=="0"){
+		unite_a="";
+	}else if(product['strRentalUnita'][focusindex]=="1"){
+		unite_a="天";
+	}else if(product['strRentalUnita'][focusindex]=="2"){
+		unite_a="周";
+	}else if(product['strRentalUnita'][focusindex]=="3"){
+		unite_a="月";
+    }else if(product['strRentalUnita'][focusindex]=="4"){
+		unite_a="半年";
+    }else if(product['strRentalUnita'][focusindex]=="5"){
+		unite_a="年";
+    }else if(product['strRentalUnita'][focusindex]=="6"){
+		unite_a="小时";
+    }else if(product['strRentalUnita'][focusindex]=="7"){
+		unite_a="分钟";
+    }else{
+	    unite_a="";
+	}
+	//添加元/次测试
+//	var price_a="";
+//	if(product['strPurchaseTypea'][focusindex]=="1"){
+//		price_a="元/次";
+//		}else{
+//			price_a="元";
+//			}
+	if(product['strPurchaseTypea'][focus_index]=="0"){
+		document.getElementById("product_endtime").innerHTML="自然月";
+	}else{
+		if(product['strRentalUnita'][focusindex]!="7"&&product['strRentalUnita'][focusindex]!="0"){
+			document.getElementById("product_endtime").innerHTML = product['strRentalTerma'][focusindex]+""+unite_a;
+		}else if (product['strRentalUnita'][focusindex]=="0"){
+			var data_time = new Date();
+            var time_now = data_time.getTime();
+			var time_db = product['strRentalTerma'][focusindex]*1000;//化为毫秒
+	 	  data_time.setTime(time_db + time_now);
+		document.getElementById("product_endtime").innerHTML=data_time.getFullYear()+"-"+checkTime(data_time.getMonth()+1)+"-"+checkTime(data_time.getDate())+"  "+checkTime(data_time.getHours())+":"+checkTime(data_time.getMinutes())+":"+checkTime(data_time.getSeconds());
+		}
+	}
+	
+   document.getElementById("product_name").innerHTML = product['strProductNamea'][focusindex];
+   document.getElementById("product_price").innerHTML = product['strPricea'][focusindex]+"元";
+   
+   document.getElementById("product_discribe").innerHTML = product['strProductDesca'][focusindex];
+}
+
+      function checkTime(i){
+         if(i<10){
+           i="0"+i;
+         }
+         return i;
+      }
+function cateKeyDown(){
+	
+	//document.getElementById("order_button").style.visibility = "hidden";
+	//document.getElementById("remove_button").style.visibility = "hidden";
+	//alert("cateKeyDown");
+	if(document.getElementById("order_button").style.visibility == "hidden"  && document.getElementById("remove_button").style.visibility == "hidden"){
+    blur_left_index(left_focus_index);
+	textScroll(-1);
+	left_focus_index++;
+	if(istart+left_focus_index<iend){
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}else{
+		page_next();
+		show_product_list();
+		left_focus_index=0;
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}
+	}
+}
+
+function cateKeyUp(){
+	//document.getElementById("order_button").style.visibility = "hidden";
+	//document.getElementById("remove_button").style.visibility = "hidden";
+	//alert("cateKeyUp");
+	if(document.getElementById("order_button").style.visibility == "hidden"  && document.getElementById("remove_button").style.visibility == "hidden"){
+    blur_left_index(left_focus_index);
+	textScroll(-1);
+	left_focus_index--;
+	if(left_focus_index>=0){
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}else{
+		page_prev();
+		show_product_list();
+		left_focus_index=0;
+		focus_left_index(left_focus_index);
+		textScroll(1);
+		focus_index = istart+left_focus_index;
+		show_product_recommend(focus_index);
+	}
+	}
+}
+
+function cateKeyLeft(){
+	//alert("cateKeyLeft");
+   if(document.getElementById("remove_button").style.visibility=="visible"){
+	   document.getElementById("remove_button").style.visibility="hidden";
+	   document.getElementById("order_button").style.visibility="visible";
+	}else
+   if(document.getElementById("order_button").style.visibility=="visible"){
+	    document.getElementById("order_button").style.visibility="hidden";
+		left_focus_flag=1;
+		textScroll(1);
+		focus_left_index(left_focus_index);
+   }else
+   if(document.getElementById("dialog_order").style.visibility=="visible"){
+		if(document.getElementById("dialog_order_button").style.visibility=="visible"){
+			document.getElementById("dialog_order_button").style.visibility="hidden";
+		    document.getElementById("dialog_remove_button").style.visibility="visible";
+		}else if(document.getElementById("dialog_remove_button").style.visibility=="visible"){
+			document.getElementById("dialog_order_button").style.visibility="visible";
+		    document.getElementById("dialog_remove_button").style.visibility="hidden";
+		}
+		
+     }
+}
+
+function cateKeyRight(){
+	//alert("cateKeyRight");
+	if(left_focus_flag==1){
+		
+		focus_left_index_blr(left_focus_index);
+		left_focus_flag=0;
+		textScroll(-1);
+		document.getElementById("order_button").style.visibility="visible";
+	}else
+    if(document.getElementById("order_button").style.visibility=="visible"){
+		
+	    document.getElementById("order_button").style.visibility="hidden";
+		document.getElementById("remove_button").style.visibility="visible";
+     }else if(document.getElementById("dialog_order").style.visibility=="visible"){
+		if(document.getElementById("dialog_order_button").style.visibility=="visible"){
+			document.getElementById("dialog_order_button").style.visibility="hidden";
+		    document.getElementById("dialog_remove_button").style.visibility="visible";
+		}else if(document.getElementById("dialog_remove_button").style.visibility=="visible"){
+			document.getElementById("dialog_order_button").style.visibility="visible";
+		    document.getElementById("dialog_remove_button").style.visibility="hidden";
+		}
+		
+     }
+}
+
+function cateKeyOK(){
+    if(document.getElementById("order_button").style.visibility=="visible"){
+	   document.getElementById("order_button").style.visibility="hidden";
+	   document.getElementById("dialog_order").style.visibility="visible";
+	   //document.getElementById("test").innerHTML="====="+product['strPurchaseTypea'][left_focus_index];
+	   if(product['strPurchaseTypea'][left_focus_index]==0){
+		   document.getElementById("order_img").src="images/order/dialog_order_all.png";
+	   }else{
+		   document.getElementById("order_img").src="images/order/dialog_order.png";
+	   }
+	   document.getElementById("dialog_order_button").style.visibility="visible";
+	   
+	}else if(document.getElementById("remove_button").style.visibility=="visible"){
+		document.getElementById("big_bg").style.display="none";
+		window.parent.document.getElementById("detail_bg").style.display = "block";
+		window.parent.document.getElementById("detail").style.visibility = "visible";
+		
+			if(window.parent.document.getElementById("playimg")!=null){
+			window.parent.document.getElementById("playimg").style.visibility = "visible";	
+		}
+		
+        window.parent.document.getElementById("fdiv").style.width = "1px";
+        window.parent.document.getElementById("fdiv").style.height = "1px";
+        window.parent.document.getElementById("hiddenFrame").style.width="1px";
+        window.parent.document.getElementById("hiddenFrame").style.height="1px";
+		window.parent.document.onkeypress = window.parent.mykeypres;
+		//alert("111111=return");
+	}else if(document.getElementById("dialog_order").style.visibility=="visible"){
+		if(document.getElementById("dialog_order_button").style.visibility=="visible"){
+			document.getElementById("dialog_order").style.visibility="hidden";
+			//
+			load_order_result();
+			//if(0==1){
+//		//alert("111111aaaa");
+//	       document.getElementById("dialog_ordered_failed").style.visibility="visible";
+//	       set_back_time();
+//	       }else{
+//		//alert("22333wssss");
+//	      document.getElementById("dialog_ordered").style.visibility="visible";
+//	       set_play_time();
+//	      }
+			
+		}else if(document.getElementById("dialog_remove_button").style.visibility=="visible"){
+			//left_focus_flag=1;
+			document.getElementById("dialog_order").style.visibility="hidden";
+			document.getElementById("dialog_remove_button").style.visibility="hidden";
+			document.getElementById("order_button").style.visibility = "visible";
+			
+		}
+	}
+
+}
+
+function load_order_result(){
+	//alert("22222222222");
+	var nowURL = istart+left_focus_index; 
+    var requestUrl = product['order_urla'][nowURL];
+	//alert("33333333333333"+requestUrl);
+    var loaderSearch = new net.ContentLoader(requestUrl, show_order_result);
+
+}
+
+function show_order_result(){
+	
+	var results = this.req.responseText;
+	//document.getElementById("product_program_name").innerHTML =results;
+    catedata = eval("(" + results + ")");
+	playUrl = catedata.playUrl;
+	var orderFlag = parseInt(catedata.orderFlag,10) ;
+	//alert("orderFlag==="+orderFlag);
+	if(0==orderFlag){
+		//alert("111111aaaa");
+	 document.getElementById("dialog_ordered_failed").style.visibility="visible";
+	 set_back_time();
+	}else{
+		if(product['strPurchaseTypea'][left_focus_index]==0){
+			document.getElementById("dialog_ordered_all").style.visibility="visible";
+			
+		}else{
+			document.getElementById("dialog_ordered").style.visibility="visible";
+		}
+	 
+	 set_play_time();
+	}
+	
+}
+function set_play_time(){
+	setTimeout("play_url()",2000);
+}
+function play_url(){
+
+ document.getElementById("big_bg").style.display="none";
+ window.parent.document.getElementById("detail_bg").style.display="none";
+ window.parent.document.getElementById("fdiv").style.width = "1px";
+ window.parent.document.getElementById("fdiv").style.height = "1px";
+ window.parent.document.getElementById("hiddenFrame").style.width="1px";
+ window.parent.document.getElementById("hiddenFrame").style.height="1px";
+ window.parent.top.mainWin.frames["hiddenFrame"].document.location=playUrl;	
+//window.parent.top.mainWin.frames["hiddenFrame"].document.location = "vod_order_success.jsp?columnid=130601&programid=0000000030010000102790&programtype=0&programname=xx&vodtype=0&leefocus=href4";
+//document.location="vod_order_success.jsp?columnid=130601&programid=0000000030010000102790&programtype=0&programname=xx&vodtype=0&leefocus=href4";
+}
+function set_back(){
+	document.getElementById("dialog_ordered_failed").style.visibility="hidden";
+}
+function set_back_time(){
+	setTimeout("set_back()",2000);
+}
+
+function init_focus(){
+	focus_left_index(left_focus_index);
+	textScroll(1);
+}
+
+function focus_left_index(focus_id){
+  document.getElementById("select_order_product_"+focus_id).src="images/portal/focus.png";
+}
+function blur_left_index(focus_id){
+	document.getElementById("select_order_product_"+focus_id).src="images/btn_trans.gif";
+}
+function focus_left_index_blr(focus_id){
+	document.getElementById("select_order_product_"+focus_id).src="images/vod/btv_column_focus.png";
+}
+function page_up_down(){
+	//alert("page_up_down");
+	if(pageSeq>0){
+	document.getElementById("button_up").style.visibility ="visible";
+	}else{
+	document.getElementById("button_up").style.visibility ="hidden";
+	}
+	if(pageSeq+1<pageCount){
+	document.getElementById("button_down").style.visibility ="visible";
+	}else{
+	document.getElementById("button_down").style.visibility ="hidden";
+	}
+
+}
+function page_next(){
+	if(pageCount>1){
+	pageSeq++;
+	if(pageSeq<pageCount){
+		istart = pageSeq*5;
+		if(pageSeq+1==pageCount){
+			iend = length;
+		}else{
+			
+			iend = (pageSeq+1)*5;
+		}
+	}else{
+		pageSeq=0;
+		istart = 0;
+		iend = 5;
+	}
+	}
+	page_up_down();
+}
+function page_prev(){
+	if(pageCount>1){
+	pageSeq--;
+	if(pageSeq>=0){
+		istart = pageSeq*5;
+		iend = (pageSeq+1)*5;
+	}else{
+		pageSeq=pageCount-1;
+		istart = pageSeq*5;
+		iend =length;
+	}
+	}
+	page_up_down();
+}
+function textScroll(doi) {
+    try{
+        if (doi == 1) {
+            scrollString("order_product_name_" + left_focus_index, product['strProductNamea'][left_focus_index+istart], 32, 200);
+        }
+        if (doi == -1) {
+            stopscrollString("order_product_name_" + left_focus_index, product['strProductNamea'][left_focus_index+istart], 32, 200);
+        }
+    }catch(e){
+        alert("SSSSSSSSSSSSSSStextScroll!!!");
+    }
+}

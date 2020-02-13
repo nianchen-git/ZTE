@@ -1,0 +1,248 @@
+<%@page contentType="text/html; charset=GBK" %>
+<%@taglib uri="/WEB-INF/epgtag.tld" prefix="epg" %>
+<html>
+<head>
+    <script language="javascript">
+        var $$=[];
+        function $(id) {
+            if (!$$[id]) {
+                $$[id] = document.getElementById(id);
+            }
+            return $$[id];
+        }
+        var volume = 0;
+        var volumeBarCount = 0;
+        var disableWithTimer = "";
+
+        function pageDisableWithTimer() {
+            top.jsClearKeyFunction();
+            top.jsHideOSD();
+        }
+
+        function pageVolumeOnKeyPressed() {
+            pageDisableWithTimer();
+        }
+
+        function showAudioChannelName() {
+            var track = top.jsGetCurrentAudioChannel();
+           // alert("SSSSSSSSSSSSSSSSSSSSSSshowAudioChannelName_track11="+track);
+            if (track == "Left") {
+                $("trackL").style.visibility = "visible";
+                $("trackR").style.visibility = "hidden";
+                $("trackS").style.visibility = "hidden";
+            } else if (track == "Right") {
+                $("trackR").style.visibility = "visible";
+                $("trackL").style.visibility = "hidden";
+                $("trackS").style.visibility = "hidden";
+            } else if (track == "Stereo") {
+                $("trackR").style.visibility = "hidden";
+                $("trackL").style.visibility = "hidden";
+                $("trackS").style.visibility = "visible";
+            }  else if (track == "JointStereo") {
+               // alert("SSSSSSSSSSSSSSSSSSSSSSyingcang!!");
+                $("trackR").style.visibility = "hidden";
+                $("trackL").style.visibility = "hidden";
+                $("trackS").style.visibility = "hidden";
+            }
+//            else {
+//                top.jsDoChangeTrack();
+//                alert("SSSSSSSSSSSSSSSSSSSSSSshowAudioChannelName_track1="+top.jsGetCurrentAudioChannel());
+//                alert("SSSSSSSSSSSSSSSSSSSSSSshowAudioChannelName_trackR_trackS="+$("trackR").style.visibility+"_"+$("trackS").style.visibility);
+//                if ($("trackR").style.visibility == "visible") {
+//                    $("trackR").style.visibility = "hidden";
+//                    $("trackL").style.visibility = "hidden";
+//                    $("trackS").style.visibility = "visible";
+//                } else if ($("trackS").style.visibility == "visible") {
+//                    if(window.navigator.appName.indexOf("ztebw")>=0){
+//                        alert("SSSSSSSSSSSSSSSSSright");
+//                        $("trackR").style.visibility = "visible";
+//                        $("trackL").style.visibility = "hidden";
+//                        $("trackS").style.visibility = "hidden";
+//                    }else{
+//                        alert("SSSSSSSSSSSSSSSSSleft");
+//                        $("trackR").style.visibility = "hidden";
+//                        $("trackL").style.visibility = "visible";
+//                        $("trackS").style.visibility = "hidden";
+//                    }
+//                }
+//            }
+        }
+
+        function pageAudioChannel() {
+          //  alert("SSSSSSSSSSSSSSSSSSSSSSpageAudioChannel");
+            top.resetOSDInfoTimer();
+            top.jsDoChangeTrack();
+            showAudioChannelName();
+        }
+
+        function vitur() {
+            top.virtualEvent();
+        }
+
+        function pageInitAudioChannel() {
+            top.resetOSDInfoTimer();
+            showAudioChannelName();
+        }
+
+
+        function pageVolumePlus() {
+            pageRight();
+        }
+
+        function pageVolumeMinus() {
+            pageLeft();
+        }
+
+        function pageLeft() {
+            top.resetOSDInfoTimer();
+            if (volume > 0) {
+                volume = volume - 5;
+                volumeBarCount = parseInt(volume / 5);
+                top.jsSetVolume(volume);
+                $("volumeDiv"+volumeBarCount).style.visibility = 'hidden';
+            }
+            var vol = parseInt(top.jsGetVolume());
+            if (vol == 0) {
+                top.doSetMuteState(1);
+                top.jsHideOSD();
+                top.showMuteOSD();
+            }
+            if (disableWithTimer) {
+                clearTimeout(disableWithTimer);
+            }
+            disableWithTimer = setTimeout("pageDisableWithTimer();", 3000);
+        }
+
+        function pageRight() {
+            top.resetOSDInfoTimer();
+            if (volume < 100) {
+                volume = volume + 5;
+                volumeBarCount = parseInt(volume / 5);
+                top.jsSetVolume(volume);
+                var tem = volumeBarCount - 1;
+                $("volumeDiv"+tem).style.visibility = 'visible';
+            }
+             if (disableWithTimer) {
+                clearTimeout(disableWithTimer);
+            }
+            disableWithTimer = setTimeout("pageDisableWithTimer();", 3000);
+        }
+
+        function refreshVolumeBar() {
+            for (var i = 0; i < volumeBarCount; i++) {
+                $("volumeDiv"+i).style.visibility = 'visible';
+            }
+        }
+
+        function pageMute() {
+            top.jsHideOSD();
+            var muteState = top.doGetMuteState();
+            var vol = parseInt(top.jsGetVolume());
+            if (muteState == 0) {
+                top.doSetMuteState(1);
+                top.showMuteOSD();
+            } else if (vol != 0) {
+                top.doSetMuteState(0);
+                top.showVolumeOSD();
+            }
+            if (disableWithTimer) {
+                clearTimeout(disableWithTimer);
+            }
+            disableWithTimer = setTimeout("pageDisableWithTimer();", 3000);
+        }
+
+        function pageInit() {
+            volume = top.jsGetVolume();
+            volumeBarCount = parseInt(volume / 5);
+            
+            top.jsSetupKeyFunction("top.mainWin.pageVolumePlus", 0x0103);
+            top.jsSetupKeyFunction("top.mainWin.pageVolumeMinus", 0x0104);
+            top.jsSetupKeyFunction("top.mainWin.pageLeft", 0x0025);
+            top.jsSetupKeyFunction("top.mainWin.pageRight", 0x0027);
+            top.jsSetupKeyFunction("top.mainWin.pageVolumeOnKeyPressed", "onKeyPressed");
+            top.jsSetupKeyFunction("top.mainWin.pageAudioChannel", 0x0106);
+            top.jsSetupKeyFunction("top.mainWin.pageMute", 0x0105);
+            top.jsSetupKeyFunction("top.mainWin.vitur", 0x0300);
+            refreshVolumeBar();
+            pageInitAudioChannel();
+        }
+        document.onkeypress = top.doKeyPress;
+        focus();
+    </script>
+</head>
+
+<body bgcolor="transparent" onload="pageInit()">
+<div style="left:0;top:491;position:absolute">
+    <img src="images/sounds/soundBg.png" alt="" width="1280" height="194"/>
+</div>
+<%--<div style="left:59; top:545;width:71;height:92; position:absolute" id="volumeBack">--%>
+    <%--<img width="71" height="92" src="images/sounds/soundIcon.png" alt=""  width="71" height="92"/>--%>
+<%--</div>--%>
+
+<%--<div id="volumeDiv20"--%>
+<%--style="left:50; top:470; width:50; height:25; font-size:30; font-weight:bold; color:yellow; position:absolute"></div>--%>
+<div style="left:1000; top:555; visibility:hidden; position:absolute" id="trackR">
+    <img src="images/sounds/soundRight_all.png" alt=""  />
+    <%--<div style="left:1180; top:555;width:45;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundRightRed.png" alt=""  width="45" height="65"/>--%>
+    <%--</div>--%>
+    <%--<div style="left:1050; top:555;width:121;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundRightBtn.png" alt=""  width="121" height="69"/>--%>
+    <%--</div>--%>
+    <%--<div style="left:1000; top:555;width:42;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundLeft.png" alt=""  width="42" height="62"/>--%>
+    <%--</div>--%>
+</div>
+<div style="left:1000; top:555; visibility:hidden; position:absolute" id="trackL">
+    <img src="images/sounds/soundLeft_all.png" alt=""  />
+    <%--<div style="left:1000; top:555;width:45;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundLeftRed.png" alt=""  width="45" height="65"/>--%>
+    <%--</div>--%>
+    <%--<div style="left:1050; top:555;width:121;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundLeftBtn.png" alt=""  width="121" height="69"/>--%>
+    <%--</div>--%>
+    <%--<div style="left:1180; top:555;width:42;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundRight.png" alt=""  width="42" height="62"/>--%>
+    <%--</div>--%>
+</div>
+
+<div style="left:1000; top:555; visibility:hidden; position:absolute" id="trackS">
+    <img src="images/sounds/soundStereo_all.png" alt="" />
+    <%--<div style="left:1180; top:555;width:45;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundRightRed.png" alt=""  width="45" height="65"/>--%>
+    <%--</div>--%>
+    <%--<div style="left:1050; top:555;width:121;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundStereoBtn.png" alt="" width="121" height="69"/>--%>
+    <%--</div>--%>
+    <%--<div style="left:1000; top:555;width:42;height:28; font-weight:bold; position:absolute">--%>
+        <%--<img src="images/sounds/soundLeftRed.png" alt="" width="45" height="65"/>--%>
+    <%--</div>--%>
+</div>
+
+
+<%--<%--%>
+    <%--for (int i = 1; i <= 20; i++) {--%>
+        <%--int left = 120 + i * 40;--%>
+<%--%>--%>
+<%--<div style="left:<%=left%>; top:561;width:25;height:53; position:absolute; ">--%>
+    <%--<img src="images/sounds/soundBlack.png" alt="" width="25" height="53"/></div>--%>
+<%--<%}%>--%>
+
+<div style="left:118; top:0px;  position:absolute;">
+    <%
+        for(int i=0;i<20;i++){
+        int left=40+i*40;
+    %>
+    <div style="left:<%=left%>; top:560;width:20;height:8; position:absolute;" >
+        <div style="left:0; top:0;width:20;height:8; position:absolute; visibility:hidden" id="volumeDiv<%=i%>">
+            <img src="images/sounds/soundRed.png" alt="" width="29" height="57"/>
+        </div>
+    </div>
+        <%
+            }
+        %>
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,145 @@
+<%@ page contentType="text/html; charset=GBK" %>
+<%@ taglib uri="/WEB-INF/epgtag.tld" prefix="epg" %>
+<%!
+    public String getPath(String uri) {
+        String path = "";
+        int begin = 0;
+        int end = uri.lastIndexOf('/');
+        if (end > 0) {
+            path = uri.substring(begin, end + 1) + path;
+        }
+        return path;
+    }
+%>
+<%
+     String path = getPath(request.getRequestURI());
+%>
+<html>
+<head>
+    <title>osd</title>
+    <script language="javascript">
+        function delayStop() {
+            top.vodBackTimer = top.setTimeout("top.switchToStopOSDUrl(0)", 600);
+           <%--top.setTimeout("top.mainWin.document.location='<%=path%>back.jsp'",1000);--%>
+        }
+        //Stop
+        function pageDoVodStop() {
+            var currentChannel = top.channelInfo.currentChannel;
+            if (currentChannel == -1) {
+                currentChannel = top.channelInfo.lastChannel;
+            }
+            delayStop();
+            top.jsHideOSD();
+            top.doStop();
+            top.setBwAlpha(0);
+            if (top.channelInfoArr[currentChannel] != undefined && top.channelInfoArr[currentChannel] != null) {
+                if (top.channelInfoArr[currentChannel].channelType != 3) {
+                    top.jsRedirectChannel(currentChannel);
+                }
+            }
+        }
+        //Mark and Stop
+        function pageDoVODMark()
+        {
+            top.setBwAlpha(0);
+            top.jsSaveFaver();//添加书签，方法在框架中
+            pageDoVodStop();
+        }
+        //cancle
+        function disablePageWithoutTimer()
+        {
+            top.jsHideOSD();
+        }
+        function changeImage(flag, id) {
+            if(flag==1){
+                document.getElementById(id).style.visibility ="visible";
+                document.getElementById(id+"0").style.visibility ="hidden";
+            }else{
+                document.getElementById(id).style.visibility ="hidden";             
+                document.getElementById(id+"0").style.visibility ="visible";             
+            }
+        }
+        document.onkeypress = top.doKeyPress;
+        focus();
+    </script>
+</head>
+<body bgcolor="transparent">
+<div style="left:356px; top:229px;width:568px;height:262px; position:absolute;">
+    <img src="images/vod/btv_promptbg.png" border="0" alt="">
+</div>
+
+
+<div style="position:absolute;width:300;height:30;left:380;top:280;font-size:24px;color:#FFFFFF;"> 直接退出无法保存收看进度</div>
+<div style="position:absolute;width:450;height:70;left:380;top:320;font-size:24px;color:#FFFFFF;"> 您可以选择添加书签退出以便下次从此处继续收看此影片</div>
+
+
+<!--Mark and Stop-->
+<div style="left:370; top:10;width:142px;height:32px; position:absolute;">
+    <a href="javascript:pageDoVODMark();" name="llinkerplay1"
+       onFocus="changeImage('1','divplay');"
+       onBlur="changeImage('0','divplay')">
+        <img src="images/btn_trans.gif" width="1" height="1" border="0" alt=""/>
+    </a>
+</div>
+<div style="left:370; top:437px;width:176px;height:38px; position:absolute;">
+    <div id="divplay0" style="left:0; top:0px;width:176px;height:38px; position:absolute;visibility:hidden">
+        <img src="images/vod/btv-02-add-bookmarkquit.png" width="176" height="38" border="0" alt=""/>
+    </div>
+    <div id="divplay" style="left:0; top:0px;width:176px;height:38px; position:absolute;visibility:visible">
+        <img  src="images/vod/btv-02-add-bookmarkc.png" width="176" height="38" border="0" alt=""/>
+    </div>
+</div>
+<div style="position:absolute; left:370; top:443; width:176;" align="center">
+    <font size="5" color="#FFFFFF">添加书签退出</font>
+</div>
+
+
+<!--stop-->
+<div style="left:550; top:10;width:90;height:30px; position:absolute;">
+    <a href="javascript:pageDoVodStop();" name="llinkerplay"
+       onFocus="changeImage('1','divtrail');"
+       onBlur="changeImage('0','divtrail')">
+        <img src="images/btn_trans.gif" width="1" height="1" border="0" alt=""/>
+    </a>
+</div>
+<div  style="left:550; top:437px;width:176;height:38px; position:absolute;">
+    <div id="divtrail0" style="left:0; top:0px;width:176;height:38px; position:absolute;">
+        <img  src="images/vod/btv-02-add-bookmarkquit.png" width="176" height="38" border="0" alt=""/>
+    </div>
+    <div id="divtrail" style="left:0; top:0px;width:176;height:38px; position:absolute;visibility:hidden">
+        <img src="images/vod/btv-02-add-bookmarkc.png" width="176" height="38" border="0" alt=""/>
+    </div>
+</div>
+<div style="position:absolute; left:550px; top:443px; width:176;" align="center">
+    <font size="5" color="#FFFFFF">直接退出</font>
+</div>
+
+
+<!--cancle-->
+<div style="left:730; top:10px;width:94px;height:30px; position:absolute;">
+    <a href="javascript:disablePageWithoutTimer();" name="llinkerplay2"
+       onFocus="changeImage('1','canclediv');"
+       onBlur="changeImage('0','canclediv')">
+        <img src="images/btn_trans.gif" width="1" height="1" border="0" alt=""/>
+    </a>
+</div>
+<div style="left:730; top:437px;width:176px;height:38px; position:absolute;">
+    <div id="canclediv0" style="left:0; top:0;width:176px;height:38px; position:absolute;">
+        <img src="images/vod/btv-02-add-bookmarkquit.png" width="176" height="38" border="0" alt=""/>
+    </div>
+    <div id="canclediv"  style="left:0; top:0px;width:176px;height:38px; position:absolute;visibility:hidden">
+        <img src="images/vod/btv-02-add-bookmarkc.png" width="176" height="38" border="0" alt=""/>
+    </div>
+</div>
+<div style="position:absolute; left:730; top:443px; width:176px" align="center">
+    <font size="5" color="#FFFFFF">取消</font></div>
+</div>
+
+<script language="javascript">
+    if (document.links["llinkerplay"] != null){
+        changeImage('0','divplay');
+        document.links["llinkerplay"].focus();
+    }
+</script>
+</body>
+</html>
